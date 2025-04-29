@@ -18,6 +18,22 @@ class MainActivity : ComponentActivity() {
 
 @Preview
 @Composable
-fun AppAndroidPreview() {
-    App()
+fun MainScreen() {
+    val navController = rememberNavController()
+
+    Scaffold(
+        bottomBar = { BottomNavBar(navController) }
+    ) { innerPadding ->
+        NavHost(
+            navController,
+            startDestination = BottomNavItem.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(BottomNavItem.Home.route) { HomeScreen() }
+            composable(BottomNavItem.Marketplace.route) { MarketplaceScreen() }
+            composable(BottomNavItem.Post.route) { PostScreen() }
+            composable(BottomNavItem.Chat.route) { ChatScreen() }
+            composable(BottomNavItem.Profile.route) { ProfileScreen() }
+        }
+    }
 }
