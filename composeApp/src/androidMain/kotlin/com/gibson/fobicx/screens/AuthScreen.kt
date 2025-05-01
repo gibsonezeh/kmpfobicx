@@ -5,16 +5,20 @@ import androidx.compose.material3.*
 import androidx.compose.foundation.layout.*
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AuthScreen(navController: NavHostController) {
+fun AuthScreen(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
