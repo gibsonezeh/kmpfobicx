@@ -104,8 +104,18 @@ android {
     }
 }
 
+
+
 dependencies {
     debugImplementation(compose.uiTooling)
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.compose.ui:ui:1.5.3")
+    implementation("androidx.compose.material3:material3:1.2.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // Firebase Auth
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+    implementation("com.google.firebase:firebase-analytics-ktx:21.5.0")
 }
 
 compose.desktop {
