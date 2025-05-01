@@ -120,7 +120,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.gibson.fobicx.MainKt"
+        mainClass ="com.gibson.fobicx.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

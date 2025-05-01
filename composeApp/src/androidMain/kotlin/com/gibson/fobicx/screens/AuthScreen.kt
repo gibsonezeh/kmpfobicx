@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.foundation.layout.*
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun AuthScreen(navController: NavHostController) {
