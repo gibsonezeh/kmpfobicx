@@ -6,6 +6,8 @@ import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 
 @Composable
 fun SplashScreen(navController: NavHostController) {
