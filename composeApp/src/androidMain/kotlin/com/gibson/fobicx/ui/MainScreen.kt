@@ -1,29 +1,24 @@
-package com.gibson.fobicx.ui
+package com.gibson.fobicx.screens
 
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.gibson.fobicx.navigation.BottomNavBar
-import com.gibson.fobicx.screens.*
+import com.gibson.fobicx.navigation.NavigationGraph
 
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+
     Scaffold(
         bottomBar = { BottomNavBar(navController) }
-    ) { padding ->
-        NavHost(
+    ) { innerPadding ->
+        NavigationGraph(
             navController = navController,
-            startDestination = "home",
-            modifier = androidx.compose.ui.Modifier.padding(padding)
-        ) {
-            composable("home") { HomeScreen() }
-            composable("market") { MarketplaceScreen() }
-            composable("post") { PostScreen() }
-            composable("chat") { ChatScreen() }
-            composable("profile") { ProfileScreen() }
-        }
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }
