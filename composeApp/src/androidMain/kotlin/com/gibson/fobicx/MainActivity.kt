@@ -3,37 +3,32 @@ package com.gibson.fobicx
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import com.gibson.fobicx.navigation.BottomNavBar
+import com.gibson.fobicx.navigation.NavigationGraph
+import com.gibson.fobicx.ui.theme.FobicxTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
-            App()
-        }
-    }
-}
-
-@Preview
-@Composable
-fun MainScreen() {
-    val navController = rememberNavController()
-
-    Scaffold(
-        bottomBar = { BottomNavBar(navController) }
-    ) { innerPadding ->
-        NavHost(
-            navController,
-            startDestination = BottomNavItem.Home.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(BottomNavItem.Home.route) { HomeScreen() }
-            composable(BottomNavItem.Marketplace.route) { MarketplaceScreen() }
-            composable(BottomNavItem.Post.route) { PostScreen() }
-            composable(BottomNavItem.Chat.route) { ChatScreen() }
-            composable(BottomNavItem.Profile.route) { ProfileScreen() }
+            FobicxTheme {
+                val navController = rememberNavController()
+                Scaffold(
+                    bottomBar = {
+                        BottomNavBar(navController)
+                    }
+                ) { innerPadding ->
+                    NavigationGraph(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
         }
     }
 }
