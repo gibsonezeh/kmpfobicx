@@ -1,20 +1,13 @@
 package com.gibson.fobicx.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-
-sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
-    object Home : BottomNavItem("home", Icons.Default.Home, "Home")
-    object Marketplace : BottomNavItem("marketplace", Icons.Default.ShoppingCart, "Marketplace")
-    object Chat : BottomNavItem("chat", Icons.Default.Chat, "Chat")
-    object Profile : BottomNavItem("profile", Icons.Default.Person, "Profile")
-}
+import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun BottomNavBar(navController: NavController) {
@@ -24,9 +17,11 @@ fun BottomNavBar(navController: NavController) {
         BottomNavItem.Chat,
         BottomNavItem.Profile
     )
+
     NavigationBar {
-        val navBackStackEntry = navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry.value?.destination?.route
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
         items.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.label) },
