@@ -1,4 +1,3 @@
-
 package com.gibson.fobicx.screens
 
 import androidx.compose.runtime.*
@@ -15,13 +14,29 @@ fun AuthScreen(navController: NavHostController) {
     var error by remember { mutableStateOf<String?>(null) }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            singleLine = true
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            singleLine = true
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
+
         Button(onClick = {
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
@@ -29,14 +44,16 @@ fun AuthScreen(navController: NavHostController) {
                         popUpTo("auth") { inclusive = true }
                     }
                 }
-                .addOnFailureListener { e -> error = e.localizedMessage }
+                .addOnFailureListener { e ->
+                    error = e.localizedMessage
+                }
         }) {
             Text("Login / Sign Up")
         }
 
         error?.let {
             Spacer(modifier = Modifier.height(8.dp))
-            Text(it, color = MaterialTheme.colorScheme.error)
+            Text(text = it, color = MaterialTheme.colorScheme.error)
         }
     }
 }
