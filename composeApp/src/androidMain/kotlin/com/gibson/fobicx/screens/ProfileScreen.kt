@@ -4,42 +4,44 @@ import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.gibson.fobicx.utils.ThemePreferenceManager
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(context: Context) {
+fun ProfileScreen() {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var isDark by remember { mutableStateOf(false) }
+    var isDarkMode by remember { mutableStateOf(false) }
 
+    // Load saved preference
     LaunchedEffect(Unit) {
-        isDark = ThemePreferenceManager.isDarkMode(context)
+        isDarkMode = ThemePreferenceManager.isDarkMode(context)
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top
     ) {
-        Text("Profile", style = MaterialTheme.typography.headlineMedium)
-
+        Text("Profile Settings", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Dark Mode")
-            Spacer(modifier = Modifier.weight(1f))
             Switch(
-                checked = isDark,
-                onCheckedChange = {
-                    isDark = it
+                checked = isDarkMode,
+                onCheckedChange = { enabled ->
+                    isDarkMode = enabled
                     scope.launch {
-                        ThemePreferenceManager.setDarkMode(context, it)
+                        ThemePreferenceManager.setDarkMode(context, enabled)
                     }
                 }
             )
