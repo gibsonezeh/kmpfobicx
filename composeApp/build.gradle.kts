@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    id("com.google.gms.google-services")
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.kotlinComposePlugin)
@@ -108,14 +109,16 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.compose.ui:ui:1.5.3")
-    implementation("androidx.compose.material3:material3:1.2.0")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("androidx.datastore:datastore-prefrences:1.0.0")
+    implementation("androidx.compose.ui:ui:1.8.0")
+    implementation("com.google.firebase:firebase-auth:23.2.0")
+    implementation("androidx.compose.material3:material3:1.3.2")
+    implementation("androidx.navigation:navigation-compose:2.8.9")
 
     // Firebase Auth
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
-    implementation("com.google.firebase:firebase-analytics-ktx:21.5.0")
+    implementation("com.google.firebase:firebase-auth-ktx:23.2.0")
+    implementation("com.google.firebase:firebase-analytics-ktx:22.4.0")
 }
 
 compose.desktop {
