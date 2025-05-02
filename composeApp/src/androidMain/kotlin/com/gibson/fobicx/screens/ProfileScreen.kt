@@ -7,8 +7,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.gibson.fobicx.utils.ThemePreferenceManager
+import com.gibson.fobicx.ui.ThemePreferenceManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun ProfileScreen() {
@@ -18,30 +20,32 @@ fun ProfileScreen() {
 
     // Load saved preference
     LaunchedEffect(Unit) {
-        isDarkMode = ThemePreferenceManager.isDarkMode(context)
+        isDarkMode = withContext(Dispatchers.IO) {
+            ThemePreferenceManager.isDarkMode(context)
+        }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(24.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        Text("Profile Settings", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(24.dp))
+        Text("Profile", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         Row(
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Dark Mode")
             Switch(
                 checked = isDarkMode,
-                onCheckedChange = { enabled ->
-                    isDarkMode = enabled
+                onCheckedChange = {
+                    isDarkMode = it
                     scope.launch {
-                        ThemePreferenceManager.setDarkMode(context, enabled)
+                        ThemePreferenceManager.setDarkMode(context, it)
                     }
                 }
             )
