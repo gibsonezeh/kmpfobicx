@@ -5,26 +5,32 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.gibson.fobicx.screens.*
+import com.gibson.fobicx.screens.ChatScreen
+import com.gibson.fobicx.screens.HomeScreen
+import com.gibson.fobicx.screens.MarketplaceScreen
+import com.gibson.fobicx.screens.ProfileScreen
 
 @Composable
-fun NavigationGraph(navController: NavHostController, modifier: Modifier = Modifier) {
+fun NavigationGraph(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     NavHost(
         navController = navController,
         startDestination = BottomNavItem.Home.route,
         modifier = modifier
     ) {
-        composable(BottomNavItem.Home.route) {
-            HomeScreen()
+        composable(route = BottomNavItem.Home.route) {
+            HomeScreen(navController)
         }
-        composable(BottomNavItem.Marketplace.route) {
-            MarketplaceScreen()
+        composable(route = BottomNavItem.Marketplace.route) {
+            MarketplaceScreen(navController)
         }
-        composable(BottomNavItem.Chat.route) {
-            ChatScreen()
+        composable(route = BottomNavItem.Chat.route) {
+            ChatScreen(navController)
         }
-        composable(BottomNavItem.Profile.route) {
-            ProfileScreen()
+        composable(route = BottomNavItem.Profile.route) {
+            ProfileScreen(navController)
         }
     }
 }
