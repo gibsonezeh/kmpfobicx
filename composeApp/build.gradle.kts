@@ -113,7 +113,6 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.5")
     implementation("androidx.compose.ui:ui:1.8.0")
     implementation("com.google.firebase:firebase-auth:23.2.0")
-    implementation("androidx.datastore:datastore-preferences:1.1.5")
     implementation("androidx.compose.material3:material3:1.3.2")
     implementation("androidx.navigation:navigation-compose:2.8.9")
 

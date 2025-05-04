@@ -30,7 +30,7 @@ fun MainScreen() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) { HomeScreen() }
-            composable(Screen.Materials.route) { MaterialsScreen() }
+            composable(Screen.Materials.route) { MarketScreen() }
             composable(Screen.Post.route) { PostScreen() }
             composable(Screen.Stock.route) { StockScreen() }
             composable(Screen.Me.route) { ProfileScreen() }

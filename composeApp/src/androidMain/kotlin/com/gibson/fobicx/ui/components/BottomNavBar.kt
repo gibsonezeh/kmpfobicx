@@ -18,8 +18,8 @@ import androidx.compose.ui.graphics.Color
 fun BottomNavBar(
     onItemClick: (String) -> Unit
 ) {
-    val items = listOf("Home", "Materials", "Post", "Stock", "Me")
-    val icons = listOf(Icons.Default.Home, Icons.Default.Calculate, Icons.Default.Add, Icons.Default.List, Icons.Default.Person)
+    val items = listOf("Home", "Market", "Post", "Stock", "Me")
+    val icons = listOf(Icons.Default.Home, Icons.Default.ShoppingCart, Icons.Default.Add, Icons.Default.List, Icons.Default.Person)
 
     Box(
         modifier = Modifier
