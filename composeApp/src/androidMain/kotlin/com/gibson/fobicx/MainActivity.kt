@@ -4,35 +4,34 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.gibson.fobicx.navigation.BottomNavBar
 import com.gibson.fobicx.navigation.NavigationGraph
-import com.gibson.fobicx.ui.ThemePreferenceManager
 import com.gibson.fobicx.ui.theme.FobicxTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.gibson.fobicx.ui.ThemePreferenceManager
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
-            var isDarkMode by remember { mutableStateOf(false) }
+            var isDarkTheme by remember { mutableStateOf(false) }
+            val scope = rememberCoroutineScope()
 
-            // Read dark mode setting when app starts
+            // Load saved theme preference on launch
             LaunchedEffect(Unit) {
-                isDarkMode = withContext(Dispatchers.IO) {
-                    ThemePreferenceManager.isDarkMode(applicationContext)
-                }
+                isDarkTheme = ThemePreferenceManager.isDarkMode(applicationContext)
             }
 
-            FobicxTheme(darkTheme = isDarkMode) {
+            FobicxTheme(darkTheme = isDarkTheme) {
                 val navController = rememberNavController()
                 Scaffold(
-                    bottomBar = { BottomNavBar(navController) }
+                    bottomBar = {
+                        BottomNavBar(navController)
+                    }
                 ) { innerPadding ->
                     NavigationGraph(
                         navController = navController,
