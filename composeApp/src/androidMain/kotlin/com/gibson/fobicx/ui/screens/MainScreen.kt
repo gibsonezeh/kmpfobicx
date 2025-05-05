@@ -1,9 +1,11 @@
 package com.gibson.fobicx.ui.screens
 
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
 import com.gibson.fobicx.navigation.Screen
 import com.gibson.fobicx.ui.components.BottomNavBar
@@ -15,11 +17,22 @@ fun MainScreen() {
 
     Scaffold(
         bottomBar = {
-            BottomNavBar { clicked ->
-                navController.navigate(clicked) {
-                    popUpTo(navController.graph.startDestinationId) { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier.widthIn(max = 500.dp)
+                ) {
+                    BottomNavBar { clicked ->
+                        navController.navigate(clicked) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 }
             }
         }
