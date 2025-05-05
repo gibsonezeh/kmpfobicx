@@ -26,13 +26,13 @@ fun MainScreen() {
                 Box(
                     modifier = Modifier.widthIn(max = 500.dp)
                 ) {
-                    BottomNavBar { clicked ->
+                    BottomNavBar(onItemClick =  { clicked ->
                         navController.navigate(clicked) {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    })
                 }
             }
         }
