@@ -4,33 +4,48 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.gibson.fobicx.ui.screens.*
+import com.gibson.fobicx.viewmodel.AuthViewModel
+
+object Routes {
+    const val LOGIN = "login"
+    const val SIGNUP = "signup"
+    const val HOME = "home"
+}
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
 
-    val startDestination = if (authViewModel.isLoggedIn()) "home" else "login"
+    val startDestination = if (authViewModel.isLoggedIn()) Routes.HOME else Routes.LOGIN
 
     NavHost(navController = navController, startDestination = startDestination) {
-        composable("login") {
+        composable(Routes.LOGIN) {
             LoginScreen(
-                onLoginSuccess = { navController.navigate("home") { popUpTo("login") { inclusive = true } } },
-                onNavigateToSignup = { navController.navigate("signup") }
+                onLoginSuccess = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                    }
+                },
+                onNavigateToSignup = { navController.navigate(Routes.SIGNUP) }
             )
         }
-        composable("signup") {
+        composable(Routes.SIGNUP) {
             SignupScreen(
-                onSignupSuccess = { navController.navigate("home") { popUpTo("signup") { inclusive = true } } },
-                onNavigateToLogin = { navController.navigate("login") }
+                onSignupSuccess = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.SIGNUP) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = { navController.navigate(Routes.LOGIN) }
             )
         }
-        composable("home") {
+        composable(Routes.HOME) {
             MainScreen(
                 onLogout = {
                     authViewModel.logout()
-                    navController.navigate("login") {
-                        popUpTo("home") { inclusive = true }
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.HOME) { inclusive = true }
                     }
                 }
             )
