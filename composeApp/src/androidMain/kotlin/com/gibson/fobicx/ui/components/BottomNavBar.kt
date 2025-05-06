@@ -1,6 +1,7 @@
 package com.gibson.fobicx.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.graphics.Color
 
 @Composable
 fun BottomNavBar(
@@ -48,17 +48,21 @@ fun BottomNavBar(
                     if (item == "Post") {
                         Spacer(modifier = Modifier.width(48.dp)) // Leave space for center button
                     } else {
-                        IconButton(onClick = { onItemClick(item) }) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(
-                                    imageVector = icons[index],
-                                    contentDescription = item
-                                )
-                                Text(
-                                    text = item,
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
+                        Column(
+                            modifier = Modifier
+                                .clickable { onItemClick(item) }
+                                .padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = icons[index],
+                                contentDescription = item,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = item,
+                                style = MaterialTheme.typography.labelSmall
+                            )
                         }
                     }
                 }
