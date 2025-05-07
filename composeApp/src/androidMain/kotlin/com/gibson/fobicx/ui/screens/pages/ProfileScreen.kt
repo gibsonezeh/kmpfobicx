@@ -46,7 +46,7 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxSize()
             )
             Image(
-                painter = painterResource(id = R.drawable.profile_placeholder), // replace with your profile image
+                painter = painterResource(id = R.drawable.20250325_155646), // replace with your profile image
                 contentDescription = null,
                 modifier = Modifier
                     .size(100.dp)
