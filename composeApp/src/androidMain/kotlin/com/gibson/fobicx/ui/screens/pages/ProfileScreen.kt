@@ -41,7 +41,7 @@ fun ProfileScreen(
             .background(MaterialTheme.colorScheme.primary)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.cover_placeholder), // replace with your cover image
+                painter = painterResource(id = R.drawable.20250314_180933), // replace with your cover image
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize()
             )
