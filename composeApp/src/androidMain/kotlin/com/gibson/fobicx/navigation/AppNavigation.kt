@@ -1,9 +1,11 @@
-package com.gibson.fobicx.ui.navigation
+package com.gibson.fobicx.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.gibson.fobicx.ui.screens.*
+import com.gibson.fobicx.ui.screens.auth.SignupScreen
+import com.gibson.fobicx.ui.screens.auth.LoginScreen
 import com.gibson.fobicx.viewmodel.AuthViewModel
 
 object Routes {

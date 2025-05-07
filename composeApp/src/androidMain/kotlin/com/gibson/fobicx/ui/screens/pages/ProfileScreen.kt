@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProfileScreen(
-    onLogoutClick: () -> Unit = {}
+    onLogout: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -20,7 +20,7 @@ fun ProfileScreen(
     ) {
         Text(text = "Welcome to Your Profile", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = onLogoutClick) {
+        Button(onClick = onLogout) {
             Text("Logout")
         }
     }

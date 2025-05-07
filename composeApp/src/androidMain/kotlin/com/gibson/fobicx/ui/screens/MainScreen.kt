@@ -12,7 +12,7 @@ import com.gibson.fobicx.ui.components.BottomNavBar
 import com.gibson.fobicx.ui.screens.pages.*
 
 @Composable
-fun MainScreen() {
+fun MainScreen(onLogout: () -> Unit = {}) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -46,7 +46,7 @@ fun MainScreen() {
             composable(Screen.Materials.route) { MarketScreen() }
             composable(Screen.Post.route) { PostScreen() }
             composable(Screen.Stock.route) { StockScreen() }
-            composable(Screen.Me.route) { ProfileScreen() }
+            composable(Screen.Me.route) { ProfileScreen(onLogout = onLogout) }
         }
     }
 }
