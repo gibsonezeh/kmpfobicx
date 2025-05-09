@@ -1,31 +1,33 @@
 package com.gibson.fobicx.ui.theme
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 
 private val LightColors = lightColorScheme(
-    primary = androidx.compose.ui.graphics.Color(0xFF0077CC),
-    surfaceVariant = androidx.compose.ui.graphics.Color(0xFFF0F0F0)
+    primary = Color(0xFF6200EE),
+    onPrimary = Color.White,
+    background = Color.White,
+    onBackground = Color.Black
 )
 
 private val DarkColors = darkColorScheme(
-    primary = androidx.compose.ui.graphics.Color(0xFF66B2FF),
-    surfaceVariant = androidx.compose.ui.graphics.Color(0xFF222222)
+    primary = Color(0xFF121212),
+    onPrimary = Color.White,
+    background = Color.Black,
+    onBackground = Color.White
 )
 
-@Composable
-fun FobicxTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
-    val colors = if (darkTheme) DarkColors else LightColors
+val LocalDarkMode = staticCompositionLocalOf { false }
 
-    MaterialTheme(
-        colorScheme = colors,
-        typography = Typography,
-        content = content
-    )
+@Composable
+fun FobicxTheme(isDarkTheme: Boolean, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalDarkMode provides isDarkTheme) {
+        MaterialTheme(
+            colorScheme = if (isDarkTheme) DarkColors else LightColors,
+            content = content
+        )
+    }
 }
