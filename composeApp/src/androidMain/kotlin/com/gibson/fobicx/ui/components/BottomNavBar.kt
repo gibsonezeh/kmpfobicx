@@ -14,14 +14,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
+import com.gibson.fobicx.navigation.Screen
 
 @Composable
 fun BottomNavBar(
     onItemClick: (String) -> Unit,
-    maxWidth: Dp = 500.dp // Ensures it stays centered and constrained on tablets
+    maxWidth: Dp = 500.dp
 ) {
-    val items = listOf("Home", "Market", "Post", "Stock", "Me")
-    val icons = listOf(Icons.Default.Home, Icons.Default.ShoppingCart, Icons.Default.Add, Icons.Default.List, Icons.Default.Person)
+    val items = listOf(
+        Screen.Home,
+        Screen.Market,
+        Screen.Post,
+        Screen.Stock,
+        Screen.Me
+    )
+
+    val icons = listOf(
+        Icons.Default.Home,
+        Icons.Default.ShoppingCart,
+        Icons.Default.Add,
+        Icons.Default.List,
+        Icons.Default.Person
+    )
 
     Box(
         modifier = Modifier
@@ -30,10 +44,8 @@ fun BottomNavBar(
         contentAlignment = Alignment.Center
     ) {
         Box(
-            modifier = Modifier
-                .widthIn(max = maxWidth)
+            modifier = Modifier.widthIn(max = maxWidth)
         ) {
-            // Background Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -44,23 +56,23 @@ fun BottomNavBar(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                items.forEachIndexed { index, item ->
-                    if (item == "Post") {
-                        Spacer(modifier = Modifier.width(48.dp)) // Leave space for center button
+                items.forEachIndexed { index, screen ->
+                    if (screen == Screen.Post) {
+                        Spacer(modifier = Modifier.width(48.dp))
                     } else {
                         Column(
                             modifier = Modifier
-                                .clickable { onItemClick(item) }
+                                .clickable { onItemClick(screen.route) }
                                 .padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
                                 imageVector = icons[index],
-                                contentDescription = item,
+                                contentDescription = screen.route,
                                 modifier = Modifier.size(24.dp)
                             )
                             Text(
-                                text = item,
+                                text = screen.route,
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -68,9 +80,8 @@ fun BottomNavBar(
                 }
             }
 
-            // Center Floating Post Button
             FloatingActionButton(
-                onClick = { onItemClick("Post") },
+                onClick = { onItemClick(Screen.Post.route) },
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
