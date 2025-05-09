@@ -1,90 +1,61 @@
-package com.gibson.fobicx.ui.screens.pages
+package com.gibson.fobicx.presentation.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.*
+import com.gibson.fobicx.navigation.Screen
+import com.gibson.fobicx.presentation.components.BottomNavBar
+import com.gibson.fobicx.ui.screens.pages.ProfileScreen
 
 @Composable
-fun ProfileScreen(
-    isDarkTheme: Boolean,
-    onToggleTheme: () -> Unit,
-    onLogout: () -> Unit = {}
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
+fun MainScreen(onLogout: () -> Unit = {}) {
+    val navController = rememberNavController()
 
-        // Theme toggle (top right)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Text("Dark Theme", fontSize = 14.sp)
-            Switch(
-                checked = isDarkTheme,
-                onCheckedChange = { onToggleTheme() }
-            )
-        }
+    // Theme toggle state
+    var isDarkTheme by remember { mutableStateOf(false) }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Cover Photo Placeholder
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.Gray)
-                .clickable { },
-            contentAlignment = Alignment.BottomStart
-        ) {
-            // Profile Photo Placeholder inside Cover
+    Scaffold(
+        bottomBar = {
             Box(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-                    .clickable { }
-            )
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier.widthIn(max = 500.dp)
+                ) {
+                    BottomNavBar { clicked ->
+                        navController.navigate(clicked) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // User Info
-        Text(text = "Username: Gibson Ezeh", fontSize = 18.sp)
-        Text(text = "Account Type: Aluminium Fabrication, Business", fontSize = 14.sp)
-        Text(text = "Email: gibson@example.com", fontSize = 14.sp)
-        Text(text = "UID: uid001", fontSize = 14.sp)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(text = "Teams", style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Skits / Short Videos", style = MaterialTheme.typography.titleMedium)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(text = "Settings", modifier = Modifier.clickable { }, fontSize = 16.sp)
-        Text(text = "Account Checkup", modifier = Modifier.clickable { }, fontSize = 16.sp)
-        Text(text = "Privacy Settings", modifier = Modifier.clickable { }, fontSize = 16.sp)
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(onClick = onLogout, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text("Logout")
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screen.Home.route) { Text("Home") }
+            composable(Screen.Materials.route) { Text("Materials") }
+            composable(Screen.Post.route) { Text("Post") }
+            composable(Screen.Stock.route) { Text("Stock") }
+            composable(Screen.Me.route) {
+                ProfileScreen(
+                    isDarkTheme = isDarkTheme,
+                    onToggleTheme = { isDarkTheme = !isDarkTheme },
+                    onLogout = onLogout
+                )
+            }
         }
     }
 }
