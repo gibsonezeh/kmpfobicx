@@ -23,7 +23,7 @@ fun BottomNavBar(
 ) {
     val items = listOf(
         Screen.Home,
-        Screen.Market,
+        Screen.Materials,
         Screen.Post,
         Screen.Stock,
         Screen.Me

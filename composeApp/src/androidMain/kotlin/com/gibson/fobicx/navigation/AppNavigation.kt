@@ -15,7 +15,8 @@ object Routes {
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
 
