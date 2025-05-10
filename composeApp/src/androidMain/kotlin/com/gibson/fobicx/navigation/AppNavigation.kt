@@ -5,7 +5,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.gibson.fobicx.ui.screens.*
 import com.gibson.fobicx.ui.screens.auth.*
-import com.gibson.fobicx.ui.screens.pages.*
 import com.gibson.fobicx.viewmodel.AuthViewModel
 import com.gibson.fobicx.viewmodel.ThemeViewModel
 
@@ -51,26 +50,7 @@ fun AppNavigation(themeViewModel: ThemeViewModel) {
                         popUpTo(Routes.HOME) { inclusive = true }
                     }
                 },
-                onItemClick = {}, // Add your navigation logic if needed
                 themeViewModel = themeViewModel
-            )
-        }
-
-        // Extra tabbed pages (replace MainScreen's onItemClick or bottom nav destinations with these routes)
-        composable(Screen.Home.route) { HomeScreen() }
-        composable(Screen.Materials.route) { MarketScreen() }
-        composable(Screen.Post.route) { PostScreen() }
-        composable(Screen.Stock.route) { StockScreen() }
-        composable(Screen.Me.route) {
-            ProfileScreen(
-                isDarkTheme = themeViewModel.isDarkTheme,
-                onToggleTheme = { themeViewModel.toggleTheme() },
-                onLogout = {
-                    authViewModel.logout()
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.HOME) { inclusive = true }
-                    }
-                }
             )
         }
     }
