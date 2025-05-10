@@ -9,16 +9,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.gibson.fobicx.navigation.Screen
 
 @Composable
 fun BottomNavBar(
-    onItemClick: (String) -> Unit,
+    navController: NavController,
     maxWidth: Dp = 500.dp
 ) {
     val items = listOf(
@@ -36,6 +39,9 @@ fun BottomNavBar(
         Icons.Default.List,
         Icons.Default.Person
     )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     Box(
         modifier = Modifier
@@ -60,20 +66,33 @@ fun BottomNavBar(
                     if (screen == Screen.Post) {
                         Spacer(modifier = Modifier.width(48.dp))
                     } else {
+                        val isSelected = currentRoute == screen.route
                         Column(
                             modifier = Modifier
-                                .clickable { onItemClick(screen.route) }
+                                .clickable {
+                                    if (currentRoute != screen.route) {
+                                        navController.navigate(screen.route) {
+                                            popUpTo(navController.graph.startDestinationId) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                }
                                 .padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
                                 imageVector = icons[index],
                                 contentDescription = screen.route,
+                                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(24.dp)
                             )
                             Text(
-                                text = screen.route,
-                                style = MaterialTheme.typography.labelSmall
+                                text = screen.route.replaceFirstChar { it.uppercase() },
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -81,7 +100,17 @@ fun BottomNavBar(
             }
 
             FloatingActionButton(
-                onClick = { onItemClick(Screen.Post.route) },
+                onClick = {
+                    if (currentRoute != Screen.Post.route) {
+                        navController.navigate(Screen.Post.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                },
                 shape = CircleShape,
                 containerColor = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
