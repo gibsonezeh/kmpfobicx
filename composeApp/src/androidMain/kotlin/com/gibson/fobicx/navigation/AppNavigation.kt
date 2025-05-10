@@ -16,6 +16,8 @@ object Routes {
 
 @Composable
 fun AppNavigation(
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit
 ) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
@@ -45,6 +47,8 @@ fun AppNavigation(
         }
         composable(Routes.HOME) {
             MainScreen(
+                isDarkTheme = isDarkTheme,
+                onToggleTheme = onToggleTheme,
                 onLogout = {
                     authViewModel.logout()
                     navController.navigate(Routes.LOGIN) {
