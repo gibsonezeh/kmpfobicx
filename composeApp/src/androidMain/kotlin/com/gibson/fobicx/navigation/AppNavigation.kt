@@ -5,71 +5,73 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.gibson.fobicx.ui.screens.*
 import com.gibson.fobicx.ui.screens.auth.*
+import com.gibson.fobicx.ui.screens.pages.*
 import com.gibson.fobicx.viewmodel.AuthViewModel
 import com.gibson.fobicx.viewmodel.ThemeViewModel
+
+object Routes {
+    const val LOGIN = "login"
+    const val SIGNUP = "signup"
+    const val HOME = "home"
+}
 
 @Composable
 fun AppNavigation(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
 
-    val startDestination = if (authViewModel.isLoggedIn()) Screen.Home.route else Screen.Login.route
+    val startDestination = if (authViewModel.isLoggedIn()) Routes.HOME else Routes.LOGIN
 
     NavHost(navController = navController, startDestination = startDestination) {
-        composable(Screen.Login.route) {
+        composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 },
-                onNavigateToSignup = { navController.navigate(Screen.Signup.route) }
+                onNavigateToSignup = { navController.navigate(Routes.SIGNUP) }
             )
         }
-        composable(Screen.Signup.route) {
+        composable(Routes.SIGNUP) {
             SignupScreen(
                 onSignupSuccess = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Signup.route) { inclusive = true }
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.SIGNUP) { inclusive = true }
                     }
                 },
-                onNavigateToLogin = { navController.navigate(Screen.Login.route) }
+                onNavigateToLogin = { navController.navigate(Routes.LOGIN) }
             )
         }
-        composable(Screen.Home.route) {
+        composable(Routes.HOME) {
             MainScreen(
                 onLogout = {
                     authViewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.HOME) { inclusive = true }
                     }
                 },
-                onItemClick = { route ->
-                    if (route != Screen.Home.route) {
-                        navController.navigate(route)
-                    }
-                },
+                onItemClick = {}, // Add your navigation logic if needed
                 themeViewModel = themeViewModel
             )
         }
 
-        // Other navigation destinations
-        composable(Screen.Materials.route) {
-            TextScreen("Materials Screen")
-        }
-        composable(Screen.Post.route) {
-            TextScreen("Create Post Screen")
-        }
-        composable(Screen.Stock.route) {
-            TextScreen("Stock Screen")
-        }
+        // Extra tabbed pages (replace MainScreen's onItemClick or bottom nav destinations with these routes)
+        composable(Screen.Home.route) { HomeScreen() }
+        composable(Screen.Materials.route) { MarketScreen() }
+        composable(Screen.Post.route) { PostScreen() }
+        composable(Screen.Stock.route) { StockScreen() }
         composable(Screen.Me.route) {
-            TextScreen("Profile Screen")
+            ProfileScreen(
+                isDarkTheme = themeViewModel.isDarkTheme,
+                onToggleTheme = { themeViewModel.toggleTheme() },
+                onLogout = {
+                    authViewModel.logout()
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.HOME) { inclusive = true }
+                    }
+                }
+            )
         }
     }
-}
-
-@Composable
-fun TextScreen(text: String) {
-    androidx.compose.material3.Text(text = text)
 }
