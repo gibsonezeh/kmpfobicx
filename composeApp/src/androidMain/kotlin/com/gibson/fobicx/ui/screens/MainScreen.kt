@@ -7,12 +7,13 @@ import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.gibson.fobicx.ui.components.BottomNavBar
 import com.gibson.fobicx.viewmodel.ThemeViewModel
 
 @Composable
 fun MainScreen(
     onLogout: () -> Unit,
-    onItemClick: () -> Unit,
+    onItemClick: (String) -> Unit,
     themeViewModel: ThemeViewModel
 ) {
     Scaffold(
@@ -25,9 +26,11 @@ fun MainScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomNavBar(onItemClick = onItemClick)
         }
     ) {
-        // Your main content
         Column(modifier = Modifier.padding(it).padding(16.dp)) {
             Text("Welcome to Fobicx!")
             Spacer(modifier = Modifier.height(10.dp))
