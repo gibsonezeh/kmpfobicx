@@ -12,26 +12,20 @@ import com.gibson.fobicx.ui.components.BottomNavBar
 import com.gibson.fobicx.ui.screens.pages.ProfileScreen
 
 @Composable
-fun MainScreen(onLogout: () -> Unit = {}) {
+fun MainScreen(
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit,
+    onLogout: () -> Unit = {}
+) {
     val navController = rememberNavController()
-    var isDarkTheme by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 4.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(modifier = Modifier.widthIn(max = 500.dp)) {
-                    BottomNavBar(onItemClick = { clicked ->
-                        navController.navigate(clicked) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    })
+            BottomNavBar { clicked ->
+                navController.navigate(clicked) {
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
                 }
             }
         }
@@ -48,7 +42,7 @@ fun MainScreen(onLogout: () -> Unit = {}) {
             composable(Screen.Me.route) {
                 ProfileScreen(
                     isDarkTheme = isDarkTheme,
-                    onToggleTheme = { isDarkTheme = !isDarkTheme },
+                    onToggleTheme = onToggleTheme,
                     onLogout = onLogout
                 )
             }
