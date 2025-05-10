@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.gibson.fobicx.ui.screens.*
-import com.gibson.fobicx.ui.screens.auth.SignupScreen
-import com.gibson.fobicx.ui.screens.auth.LoginScreen
+import com.gibson.fobicx.ui.screens.auth.*
 import com.gibson.fobicx.viewmodel.AuthViewModel
+import com.gibson.fobicx.viewmodel.ThemeViewModel
 
 object Routes {
     const val LOGIN = "login"
@@ -15,10 +15,7 @@ object Routes {
 }
 
 @Composable
-fun AppNavigation(
-    isDarkTheme: Boolean,
-    onToggleTheme: () -> Unit
-) {
+fun AppNavigation(themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
 
@@ -47,14 +44,14 @@ fun AppNavigation(
         }
         composable(Routes.HOME) {
             MainScreen(
-                isDarkTheme = isDarkTheme,
-                onToggleTheme = onToggleTheme,
                 onLogout = {
                     authViewModel.logout()
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.HOME) { inclusive = true }
                     }
-                }
+                },
+                onItemClick = {}, // Replace with actual navigation logic
+                themeViewModel = themeViewModel
             )
         }
     }
