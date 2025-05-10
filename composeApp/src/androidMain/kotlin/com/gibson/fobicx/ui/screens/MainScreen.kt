@@ -13,28 +13,27 @@ import com.gibson.fobicx.viewmodel.ThemeViewModel
 @Composable
 fun MainScreen(
     onLogout: () -> Unit,
-    onItemClick: () -> Unit = {},
     themeViewModel: ThemeViewModel
 ) {
-    val navController = rememberNavController()
+    val bottomNavController = rememberNavController()
 
     Scaffold(
         bottomBar = {
             BottomNavBar(
                 onItemClick = { route ->
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
+                    bottomNavController.navigate(route) {
                         launchSingleTop = true
                         restoreState = true
+                        popUpTo(bottomNavController.graph.startDestinationId) {
+                            saveState = true
+                        }
                     }
                 }
             )
         }
     ) { innerPadding ->
         NavHost(
-            navController = navController,
+            navController = bottomNavController,
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
