@@ -25,13 +25,13 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                 contentAlignment = Alignment.Center
             ) {
                 Box(modifier = Modifier.widthIn(max = 500.dp)) {
-                    BottomNavBar { clicked ->
+                    BottomNavBar(onItemClick = { clicked ->
                         navController.navigate(clicked) {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    })
                 }
             }
         }
@@ -42,9 +42,9 @@ fun MainScreen(onLogout: () -> Unit = {}) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) { Text("Home") }
-            composable(Screen.Materials.route) { Text("Materials/Market") }
-            composable(Screen.Post.route) { Text("Post Something") }
-            composable(Screen.Stock.route) { Text("Stock Info") }
+            composable(Screen.Materials.route) { Text("Market") }
+            composable(Screen.Post.route) { Text("Post") }
+            composable(Screen.Stock.route) { Text("Stock") }
             composable(Screen.Me.route) {
                 ProfileScreen(
                     isDarkTheme = isDarkTheme,
