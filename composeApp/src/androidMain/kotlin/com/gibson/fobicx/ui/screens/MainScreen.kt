@@ -1,49 +1,61 @@
 package com.gibson.fobicx.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Brightness6
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.*
-import com.gibson.fobicx.navigation.Screen
-import com.gibson.fobicx.ui.components.BottomNavBar
-import com.gibson.fobicx.ui.screens.pages.ProfileScreen
 
 @Composable
 fun MainScreen(
+    onLogout: () -> Unit,
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit,
-    onLogout: () -> Unit = {}
+    onItemClick: (String) -> Unit = {} // Default to avoid error if not passed
 ) {
-    val navController = rememberNavController()
-
     Scaffold(
-        bottomBar = {
-            BottomNavBar { clicked ->
-                navController.navigate(clicked) {
-                    popUpTo(navController.graph.startDestinationId) { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
+        topBar = {
+            TopAppBar(
+                title = { Text("Fobicx") },
+                actions = {
+                    IconButton(onClick = onToggleTheme) {
+                        Icon(Icons.Default.Brightness6, contentDescription = "Toggle Theme")
+                    }
+                    IconButton(onClick = onLogout) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
+                    }
                 }
-            }
+            )
         }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPadding)
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
         ) {
-            composable(Screen.Home.route) { Text("Home") }
-            composable(Screen.Materials.route) { Text("Market") }
-            composable(Screen.Post.route) { Text("Post") }
-            composable(Screen.Stock.route) { Text("Stock") }
-            composable(Screen.Me.route) {
-                ProfileScreen(
-                    isDarkTheme = isDarkTheme,
-                    onToggleTheme = onToggleTheme,
-                    onLogout = onLogout
+            Text(
+                text = "Welcome to Fobicx!",
+                style = MaterialTheme.typography.h5
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Example clickable items
+            listOf("Dashboard", "Profile", "Settings").forEach { item ->
+                Text(
+                    text = item,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onItemClick(item) }
+                        .padding(12.dp),
+                    style = MaterialTheme.typography.body1
                 )
             }
         }
