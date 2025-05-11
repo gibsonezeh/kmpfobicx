@@ -113,9 +113,11 @@ dependencies {
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.datastore:datastore-preferences:1.1.5")
     implementation("androidx.compose.ui:ui:1.8.0")
+    implementation("androidx.compose.material:material-icons-extended-android:1.7.8")
     implementation("com.google.firebase:firebase-auth:23.2.0")
     implementation("androidx.compose.material3:material3:1.3.2")
     implementation("androidx.navigation:navigation-compose:2.8.9")
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1") // for ViewModel
 
     // Firebase Auth

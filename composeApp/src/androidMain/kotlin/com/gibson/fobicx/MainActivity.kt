@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val themeViewModel: ThemeViewModel = viewModel()
-            FobicxTheme(darkTheme = themeViewModel.isDarkTheme.value) {
+            FobicxTheme(themeViewModel.isDarkTheme.value) {
                 AppNavigation(themeViewModel)
             }
         }
