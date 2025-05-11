@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,20 +25,19 @@ fun ProfileScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Theme toggle (top right)
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Dark Theme", fontSize = 14.sp)
+            Text("Dark Theme", fontSize = 16.sp)
             Switch(
                 checked = isDarkTheme,
                 onCheckedChange = { onToggleTheme() }
             )
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         // Cover Photo Placeholder
         Box(
@@ -63,30 +62,38 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // User Info
-        Text(text = "Username: Gibson Ezeh", fontSize = 18.sp)
-        Text(text = "Account Type: Aluminium Fabrication, Business", fontSize = 14.sp)
-        Text(text = "Email: gibson@example.com", fontSize = 14.sp)
-        Text(text = "UID: uid001", fontSize = 14.sp)
+        // User Info (Can be made dynamic)
+        Text("Username: Gibson Ezeh", fontSize = 18.sp)
+        Text("Account Type: Aluminium Fabrication, Business", fontSize = 14.sp)
+        Text("Email: gibson@example.com", fontSize = 14.sp)
+        Text("UID: uid001", fontSize = 14.sp)
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // Teams & Skits
-        Text(text = "Teams", style = MaterialTheme.typography.titleMedium)
+        Text("Teams", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Skits / Short Videos", style = MaterialTheme.typography.titleMedium)
+        Text("Skits / Short Videos", style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // Other Settings
-        Text(text = "Settings", modifier = Modifier.clickable { }, fontSize = 16.sp)
-        Text(text = "Account Checkup", modifier = Modifier.clickable { }, fontSize = 16.sp)
-        Text(text = "Privacy Settings", modifier = Modifier.clickable { }, fontSize = 16.sp)
+        listOf("Settings", "Account Checkup", "Privacy Settings").forEach {
+            Text(text = it, modifier = Modifier
+                .fillMaxWidth()
+                .clickable { /* Navigate or perform actions */ }
+                .padding(vertical = 8.dp),
+                fontSize = 16.sp
+            )
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         // Logout
-        Button(onClick = onLogout, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        Button(
+            onClick = onLogout,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
             Text("Logout")
         }
     }
