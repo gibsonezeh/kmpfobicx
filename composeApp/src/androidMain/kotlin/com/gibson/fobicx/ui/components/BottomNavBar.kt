@@ -18,6 +18,7 @@ import com.gibson.fobicx.navigation.Screen
 
 @Composable
 fun BottomNavBar(
+    currentRoute: String?,
     onItemClick: (String) -> Unit,
     maxWidth: Dp = 500.dp
 ) {
@@ -43,9 +44,7 @@ fun BottomNavBar(
             .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier.widthIn(max = maxWidth)
-        ) {
+        Box(modifier = Modifier.widthIn(max = maxWidth)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -60,6 +59,8 @@ fun BottomNavBar(
                     if (screen == Screen.Post) {
                         Spacer(modifier = Modifier.width(48.dp))
                     } else {
+                        val isSelected = currentRoute == screen.route
+
                         Column(
                             modifier = Modifier
                                 .clickable { onItemClick(screen.route) }
@@ -69,11 +70,19 @@ fun BottomNavBar(
                             Icon(
                                 imageVector = icons[index],
                                 contentDescription = screen.route,
+                                tint = if (isSelected)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(24.dp)
                             )
                             Text(
                                 text = screen.route,
-                                style = MaterialTheme.typography.labelSmall
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isSelected)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -88,7 +97,11 @@ fun BottomNavBar(
                     .size(64.dp)
                     .align(Alignment.Center)
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Post")
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Post",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     }
