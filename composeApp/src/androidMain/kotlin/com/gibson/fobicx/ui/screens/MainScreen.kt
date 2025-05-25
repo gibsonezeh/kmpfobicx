@@ -13,7 +13,6 @@ import androidx.navigation.compose.composable
 import com.gibson.fobicx.navigation.Screen
 import com.gibson.fobicx.ui.components.BottomNavBar
 import com.gibson.fobicx.ui.screens.pages.*
-import com.gibson.fobicx.viewmodel.ThemeViewModel
 
 @Composable
 fun MainScreen(onLogout: () -> Unit) {
