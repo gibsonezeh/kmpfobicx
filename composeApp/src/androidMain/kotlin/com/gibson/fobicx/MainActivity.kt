@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
 
-            FobicxTheme(useDarkTheme = isDarkTheme) {
+            FobicxTheme ( isDarkTheme = isDarkTheme) {
                 AppNavigation(
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { themeViewModel.toggleTheme() }

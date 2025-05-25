@@ -49,7 +49,9 @@ fun AppNavigation(
                 onLogout = {
                     authViewModel.logout()
                     navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.HOME) { inclusive = true }
+                        popUpTo(Routes.HOME) {
+                            inclusive = true
+                        }
                     }
                 },
                 isDarkTheme = isDarkTheme,
