@@ -102,44 +102,67 @@ fun SignupScreen(
             }
         } else {
             // Step 2: Account Type, DOB, Phone
-            val accountTypes = listOf("Personal", "Business", "Freelancer", "Aluminum Fabricator", "Retailer")
-            DropdownMenuBox(
-                selectedOption = accountType,
-                options = accountTypes,
-                label = "Account Type",
-                onOptionSelected = { accountType = it }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+val accountTypes = listOf("Personal", "Business", "Freelancer", "Aluminum Fabricator", "Retailer")
+var expanded by remember { mutableStateOf(false) }
 
-            OutlinedTextField(
-                value = dob,
-                onValueChange = { },
-                label = { Text("Date of Birth") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        val calendar = Calendar.getInstance()
-                        val datePicker = DatePickerDialog(
-                            context,
-                            { _: DatePicker, year: Int, month: Int, day: Int ->
-                                dob = "$day/${month + 1}/$year"
-                            },
-                            calendar.get(Calendar.YEAR),
-                            calendar.get(Calendar.MONTH),
-                            calendar.get(Calendar.DAY_OF_MONTH)
-                        )
-                        datePicker.show()
-                    },
-                readOnly = true
+Box(modifier = Modifier.fillMaxWidth()) {
+    OutlinedTextField(
+        value = accountType,
+        onValueChange = {},
+        label = { Text("Account Type") },
+        readOnly = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true }
+    )
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        accountTypes.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(option) },
+                onClick = {
+                    accountType = option
+                    expanded = false
+                }
             )
-            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}
+Spacer(modifier = Modifier.height(12.dp))
 
-            OutlinedTextField(
-                value = phone,
-                onValueChange = { phone = it },
-                label = { Text("Phone Number") },
-                modifier = Modifier.fillMaxWidth()
-            )
+// Date Picker
+val calendar = Calendar.getInstance()
+val datePickerDialog = DatePickerDialog(
+    context,
+    { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+        dob = "$dayOfMonth/${month + 1}/$year"
+    },
+    calendar.get(Calendar.YEAR),
+    calendar.get(Calendar.MONTH),
+    calendar.get(Calendar.DAY_OF_MONTH)
+)
+
+OutlinedTextField(
+    value = dob,
+    onValueChange = {},
+    label = { Text("Date of Birth") },
+    readOnly = true,
+    modifier = Modifier
+        .fillMaxWidth()
+        .clickable { datePickerDialog.show() }
+)
+Spacer(modifier = Modifier.height(12.dp))
+
+// Phone Field
+OutlinedTextField(
+    value = phone,
+    onValueChange = { phone = it },
+    label = { Text("Phone Number") },
+    modifier = Modifier.fillMaxWidth()
+)
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
