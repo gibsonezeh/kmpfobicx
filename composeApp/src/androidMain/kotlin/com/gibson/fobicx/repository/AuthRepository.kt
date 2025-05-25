@@ -36,6 +36,16 @@ class AuthRepository {
         }
     }
 
+    suspend fun login(email: String, password: String):
+            Result<Unit> {
+        return try {
+            auth.signInWithEmailAndPassword(email, password).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun logout() {
         auth.signOut()
     }
