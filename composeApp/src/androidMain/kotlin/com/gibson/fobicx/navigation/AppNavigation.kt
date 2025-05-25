@@ -12,12 +12,8 @@ object Routes {
     const val SIGNUP = "signup"
     const val HOME = "home"
 }
-
 @Composable
-fun AppNavigation(
-    isDarkTheme: Boolean,
-    onToggleTheme: () -> Unit
-) {
+fun AppNavigation() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
 
@@ -49,13 +45,9 @@ fun AppNavigation(
                 onLogout = {
                     authViewModel.logout()
                     navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.HOME) {
-                            inclusive = true
-                        }
+                        popUpTo(Routes.HOME) { inclusive = true }
                     }
-                },
-                isDarkTheme = isDarkTheme,
-        onToggleTheme = onToggleTheme
+                }
             )
         }
     }
