@@ -15,29 +15,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ProfileScreen(
-    isDarkTheme: Boolean,
-    onToggleTheme: () -> Unit,
-    onLogout: () -> Unit = {}
-) {
+fun ProfileScreen(onLogout: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Dark Theme", fontSize = 16.sp)
-            Switch(
-                checked = isDarkTheme,
-                onCheckedChange = { onToggleTheme() }
-            )
-        }
+        // Removed dark theme toggle
 
         // Cover Photo Placeholder
         Box(
@@ -46,23 +30,21 @@ fun ProfileScreen(
                 .height(180.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(Color.Gray)
-                .clickable { /* Trigger cover photo upload */ },
+                .clickable { },
             contentAlignment = Alignment.BottomStart
         ) {
-            // Profile Photo Placeholder inside Cover
             Box(
                 modifier = Modifier
                     .padding(16.dp)
                     .size(100.dp)
                     .clip(CircleShape)
                     .background(Color.LightGray)
-                    .clickable { /* Trigger profile image upload */ }
+                    .clickable { }
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // User Info (Can be made dynamic)
         Text("Username: Gibson Ezeh", fontSize = 18.sp)
         Text("Account Type: Aluminium Fabrication, Business", fontSize = 14.sp)
         Text("Email: gibson@example.com", fontSize = 14.sp)
@@ -70,26 +52,25 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Teams & Skits
         Text("Teams", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Text("Skits / Short Videos", style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Other Settings
         listOf("Settings", "Account Checkup", "Privacy Settings").forEach {
-            Text(text = it, modifier = Modifier
-                .fillMaxWidth()
-                .clickable { /* Navigate or perform actions */ }
-                .padding(vertical = 8.dp),
+            Text(
+                text = it,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { }
+                    .padding(vertical = 8.dp),
                 fontSize = 16.sp
             )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Logout
         Button(
             onClick = onLogout,
             modifier = Modifier.align(Alignment.CenterHorizontally)
