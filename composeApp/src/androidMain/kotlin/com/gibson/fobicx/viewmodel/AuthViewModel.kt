@@ -3,6 +3,7 @@ package com.gibson.fobicx.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gibson.fobicx.repository.AuthRepository
+import fobicx.composeapp.generated.resources.Res
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

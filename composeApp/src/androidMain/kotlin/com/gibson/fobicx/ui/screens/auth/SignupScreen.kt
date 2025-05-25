@@ -160,7 +160,7 @@ Column(
                 2 -> if (accountType.isNotBlank() && dateOfBirth.isNotBlank() && (accountType != "Other" || customAccountType.isNotBlank())) step++
                 3 -> if (password == confirmPassword && password.length >= 6) {
                     val finalAccountType = if (accountType == "Other") customAccountType else accountType
-                    authViewModel.signup(email, password, fullName, accountType, username, dateOfBirth,) // Extend this to pass other user info to Firestore
+                    authViewModel.signup(email, password, fullName, username, accountType, dateOfBirth) // Extend this to pass other user info to Firestore
                 }
             }
         },
