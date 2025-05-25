@@ -14,128 +14,122 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+
 @Composable
-fun ProfileScreen() {
-    val isDarkTheme = isSystemInDarkTheme()
-    FobicxTheme(isDarkTheme = isDarkTheme) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+fun ProfileScreen(onLogout: () -> Unit = {}) {
+    val itemsFobicx = listOf(
+        "Share with a friend" to Icons.Default.Share,
+        "Knowledge" to Icons.Default.MenuBook,
+        "Language" to Icons.Default.Language
+    )
+
+    val itemsGeneral = listOf(
+        "Account" to Icons.Default.AccountCircle,
+        "Appearance" to Icons.Default.Brightness6
+    )
+
+    val itemsInfo = listOf(
+        "Rate this app" to Icons.Default.FavoriteBorder,
+        "Contact us" to Icons.Default.Email
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
+    ) {
+        // Header
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 16.dp)
         ) {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-
-                // Close button
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.TopEnd
-                ) {
-                    IconButton(onClick = { /* Handle close */ }) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
-                    }
-                }
-
-                // Profile Header
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile_pic), // Replace with your image
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(CircleShape)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text("Gibson Ezeh", style = MaterialTheme.typography.titleMedium)
-                        Text("gibsonezeh6@gmail.com", style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Free Plan Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Free", style = MaterialTheme.typography.titleMedium)
-                            Button(onClick = { /* Handle Upgrade */ }) {
-                                Text("Upgrade")
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Credits", style = MaterialTheme.typography.labelMedium)
-                        Text("0 • Daily credits refresh at 01:00 every day", style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-
-                // Section: FOBICX
-                SectionTitle("FOBICX")
-                MenuItem(icon = Icons.Default.Share, title = "Share with a friend")
-                MenuItem(icon = Icons.Default.Book, title = "Knowledge")
-                MenuItem(icon = Icons.Default.Language, title = "Language", trailingText = "English")
-
-                // Section: General
-                SectionTitle("General")
-                MenuItem(icon = Icons.Default.AccountCircle, title = "Account")
-                MenuItem(icon = Icons.Default.Brightness4, title = "Appearance", trailingText = "Follow system")
-
-                // Section: Information
-                SectionTitle("Information")
-                MenuItem(icon = Icons.Default.FavoriteBorder, title = "Rate this app")
-                MenuItem(icon = Icons.Default.Email, title = "Contact us")
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .background(Color.DarkGray)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text("Gibson Ezeh", style = MaterialTheme.typography.titleMedium)
+                Text("gibsonezeh6@gmail.com", style = MaterialTheme.typography.bodySmall)
             }
+        }
+
+        // Free Tier Card
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Free", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Credits", style = MaterialTheme.typography.bodyMedium)
+                    Text("Daily credits refresh at 01:00 every day", style = MaterialTheme.typography.bodySmall)
+                }
+                Button(onClick = { /* Upgrade action */ }) {
+                    Text("Upgrade")
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // FOBICX Section
+        Text("FOBICX", style = MaterialTheme.typography.labelMedium)
+        itemsFobicx.forEach { (label, icon) ->
+            ProfileItem(label, icon)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // General Section
+        Text("General", style = MaterialTheme.typography.labelMedium)
+        itemsGeneral.forEach { (label, icon) ->
+            ProfileItem(label, icon, trailingText = if (label == "Appearance") "Follow system" else null)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Information Section
+        Text("Information", style = MaterialTheme.typography.labelMedium)
+        itemsInfo.forEach { (label, icon) ->
+            ProfileItem(label, icon)
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onLogout,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Logout")
         }
     }
 }
 
 @Composable
-fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.labelMedium,
-        color = Color.Gray,
-        modifier = Modifier
-            .padding(start = 16.dp, top = 24.dp, bottom = 8.dp)
-    )
-}
-
-@Composable
-fun MenuItem(
-    icon: ImageVector,
-    title: String,
-    trailingText: String? = null
-) {
+fun ProfileItem(title: String, icon: ImageVector, trailingText: String? = null) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* Handle click */ }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .clickable { }
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = title, modifier = Modifier.size(20.dp))
+        Icon(icon, contentDescription = null)
         Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = title,
-            modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.bodyMedium
-        )
-        trailingText?.let {
-            Text(it, style = MaterialTheme.typography.bodySmall)
+        Text(title, modifier = Modifier.weight(1f))
+        if (trailingText != null) {
+            Text(trailingText, style = MaterialTheme.typography.bodySmall)
+        } else {
+            Icon(Icons.Default.KeyboardArrowRight, contentDescription = null)
         }
-        Icon(Icons.Default.ChevronRight, contentDescription = "Go", modifier = Modifier.size(20.dp))
     }
 }
