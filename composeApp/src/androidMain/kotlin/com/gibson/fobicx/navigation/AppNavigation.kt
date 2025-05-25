@@ -54,7 +54,7 @@ fun AppNavigation(
                         }
                     }
                 },
-                isDarkTheme = isSystemImDarkTheme(),
+                isDarkTheme = isSystemInDarkTheme(),
                 onToggleTheme = { themeViewModel.toggleTheme() }
             )
         }
