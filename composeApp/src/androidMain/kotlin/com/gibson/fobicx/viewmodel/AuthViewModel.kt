@@ -3,7 +3,6 @@ package com.gibson.fobicx.viewmodel
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -19,7 +18,7 @@ class AuthViewModel : ViewModel() {
     // Firebase Auth instance
     val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    // Activity reference for phone auth
+    // Activity reference if needed later
     var currentActivity: Activity? = null
 
     // Auth state flow
@@ -55,26 +54,10 @@ class AuthViewModel : ViewModel() {
 
     // Simulated username check — replace with real logic
     fun checkUsernameExists(username: String, callback: (Boolean) -> Unit) {
-        // Simulate username not existing
         callback(false)
     }
 
-    // Phone credential sign-in
-    fun signInWithPhoneCredential(credential: PhoneAuthCredential, callback: (Boolean) -> Unit) {
-        _authState.value = AuthState.Loading
-        firebaseAuth.signInWithCredential(credential)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _authState.value = AuthState.Success
-                    callback(true)
-                } else {
-                    _authState.value = AuthState.Error(task.exception?.message)
-                    callback(false)
-                }
-            }
-    }
-
-    // Sign up with full user details
+    // Signup with full details (phone not verified)
     fun signupWithDetails(
         email: String,
         password: String,
@@ -88,7 +71,7 @@ class AuthViewModel : ViewModel() {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Simulate success — add Firestore saving if needed
+                    // You can save phone and other info to Firestore here
                     _authState.value = AuthState.Success
                 } else {
                     _authState.value = AuthState.Error(task.exception?.message)
