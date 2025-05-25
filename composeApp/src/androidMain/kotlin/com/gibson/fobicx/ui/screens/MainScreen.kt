@@ -16,10 +16,7 @@ import com.gibson.fobicx.ui.screens.pages.*
 import com.gibson.fobicx.viewmodel.ThemeViewModel
 
 @Composable
-fun MainScreen(
-    onLogout: () -> Unit,
-    themeViewModel: ThemeViewModel
-) {
+fun MainScreen(onLogout: () -> Unit) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -52,11 +49,7 @@ fun MainScreen(
             composable(Screen.Post.route) { PostScreen() }
             composable(Screen.Stock.route) { StockScreen() }
             composable(Screen.Me.route) {
-                ProfileScreen(
-                    isDarkTheme = isSystemInDarkTheme(),
-                    onToggleTheme = { themeViewModel.toggleTheme() },
-                    onLogout = onLogout
-                )
+                ProfileScreen(onLogout = onLogout)
             }
         }
     }
