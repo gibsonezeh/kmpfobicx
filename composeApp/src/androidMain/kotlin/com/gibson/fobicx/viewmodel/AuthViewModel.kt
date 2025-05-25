@@ -15,31 +15,31 @@ sealed class AuthState {
 }
 
 class AuthViewModel : ViewModel() {
-
     private val repository = AuthRepository()
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState
 
+    fun signup(
+        email: String,
+        password: String,
+        fullName: String,
+        username: String,
+        accountType: String,
+        dateOfBirth: String
+    ) {
+        _authState.value = AuthState.Loading
+        viewModelScope.launch {
+            val result = repository.signup(email, password, fullName, username, accountType, dateOfBirth)
+            _authState.value = if (result.isSuccess) AuthState.Success else AuthState.Error(result.exceptionOrNull()?.message)
+        }
+    }
+
     fun login(email: String, password: String) {
         _authState.value = AuthState.Loading
         viewModelScope.launch {
             val result = repository.login(email, password)
-            _authState.value = result.fold(
-                onSuccess = { AuthState.Success },
-                onFailure = { AuthState.Error(it.message) }
-            )
-        }
-    }
-
-    fun signup(email: String, password: String, name: String, accountType: String) {
-        _authState.value = AuthState.Loading
-        viewModelScope.launch {
-            val result = repository.signup(email, password, name, accountType)
-            _authState.value = result.fold(
-                onSuccess = { AuthState.Success },
-                onFailure = { AuthState.Error(it.message) }
-            )
+            _authState.value = if (result.isSuccess) AuthState.Success else AuthState.Error(result.exceptionOrNull()?.message)
         }
     }
 
