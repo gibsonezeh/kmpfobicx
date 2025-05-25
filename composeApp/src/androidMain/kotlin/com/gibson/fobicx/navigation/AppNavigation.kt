@@ -54,6 +54,8 @@ fun AppNavigation(
                         }
                     }
                 },
+                isDarkTheme = isDarkTheme,
+        onToggleTheme = onToggleTheme
             )
         }
     }
