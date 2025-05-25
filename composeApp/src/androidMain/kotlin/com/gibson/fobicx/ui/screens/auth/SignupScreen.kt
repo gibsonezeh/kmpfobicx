@@ -3,47 +3,38 @@
 package com.gibson.fobicx.ui.screens.auth
 
 import android.app.DatePickerDialog
-import android.widget.DatePicker
-import androidx.compose.foundation.clickable
+import android.util.Patterns
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gibson.fobicx.viewmodel.AuthState
 import com.gibson.fobicx.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun SignupScreen(
+fun MultiStepSignupScreen(
     authViewModel: AuthViewModel = viewModel(),
-    onSignupSuccess: () -> Unit,
-    onNavigateToLogin: () -> Unit
+    onSignupSuccess: () -> Unit
 ) {
-    val authState by authViewModel.authState.collectAsState()
-
-    var step by remember { mutableStateOf(1) }
-
-    // Step 1 Fields
+    var currentStep by remember { mutableStateOf(1) }
     var fullName by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-
-    // Step 2 Fields
     var accountType by remember { mutableStateOf("") }
+    var customAccountType by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
 
+    val authState by authViewModel.authState.collectAsState()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -51,135 +42,124 @@ fun SignupScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Sign Up", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (step == 1) {
-            OutlinedTextField(
-                value = fullName,
-                onValueChange = { fullName = it },
-                label = { Text("Full Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    val image = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = image, contentDescription = null)
+        when (currentStep) {
+            1 -> {
+                Text("Step 1: Basic Info", style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(value = fullName, onValueChange = { fullName = it }, label = { Text("Full Name") }, modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(value = username, onValueChange = { username = it }, label = { Text("Username") }, modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    if (fullName.isNotBlank() && username.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        authViewModel.checkUsernameExists(username) { exists ->
+                            if (!exists) currentStep++ else authViewModel.setError("Username already exists")
+                        }
+                    } else {
+                        authViewModel.setError("Please enter valid info")
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { step = 2 },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Next")
-            }
-        } else {
-            // Step 2: Account Type, DOB, Phone
-val accountTypes = listOf("Personal", "Business", "Freelancer", "Aluminum Fabricator", "Retailer")
-var expanded by remember { mutableStateOf(false) }
-
-Box(modifier = Modifier.fillMaxWidth()) {
-    OutlinedTextField(
-        value = accountType,
-        onValueChange = {},
-        label = { Text("Account Type") },
-        readOnly = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = true }
-    )
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        accountTypes.forEach { option ->
-            DropdownMenuItem(
-                text = { Text(option) },
-                onClick = {
-                    accountType = option
-                    expanded = false
+                }, modifier = Modifier.fillMaxWidth()) {
+                    Text("Next")
                 }
-            )
-        }
-    }
-}
-Spacer(modifier = Modifier.height(12.dp))
+            }
 
-// Date Picker
-val calendar = Calendar.getInstance()
-val datePickerDialog = DatePickerDialog(
-    context,
-    { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-        dob = "$dayOfMonth/${month + 1}/$year"
-    },
-    calendar.get(Calendar.YEAR),
-    calendar.get(Calendar.MONTH),
-    calendar.get(Calendar.DAY_OF_MONTH)
-)
+            2 -> {
+                Text("Step 2: Account Info", style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(16.dp))
+                val accountTypes = listOf("Engineer", "Doctor", "Developer", "Fabricator", "Other")
+                var expanded by remember { mutableStateOf(false) }
 
-OutlinedTextField(
-    value = dob,
-    onValueChange = {},
-    label = { Text("Date of Birth") },
-    readOnly = true,
-    modifier = Modifier
-        .fillMaxWidth()
-        .clickable { datePickerDialog.show() }
-)
-Spacer(modifier = Modifier.height(12.dp))
-
-// Phone Field
-OutlinedTextField(
-    value = phone,
-    onValueChange = { phone = it },
-    label = { Text("Phone Number") },
-    modifier = Modifier.fillMaxWidth()
-)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    authViewModel.signupWithDetails(
-                        email = email,
-                        password = password,
-                        fullName = fullName,
-                        username = username,
-                        accountType = accountType,
-                        dob = dob,
-                        phone = phone
+                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                    OutlinedTextField(
+                        value = accountType,
+                        onValueChange = { accountType = it },
+                        label = { Text("Account Type") },
+                        modifier = Modifier.menuAnchor().fillMaxWidth(),
+                        readOnly = true
                     )
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Sign Up")
+                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        accountTypes.forEach { type ->
+                            DropdownMenuItem(
+                                text = { Text(type) },
+                                onClick = {
+                                    accountType = type
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                if (accountType == "Other") {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = customAccountType,
+                        onValueChange = { customAccountType = it },
+                        label = { Text("Specify your Account Type") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                val calendar = Calendar.getInstance()
+                val datePicker = DatePickerDialog(
+                    context,
+                    { _, y, m, d -> dob = String.format("%04d-%02d-%02d", y, m + 1, d) },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+                Button(onClick = { datePicker.show() }) {
+                    Text(if (dob.isBlank()) "Select Date of Birth" else dob)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    if (dob.isNotBlank()) currentStep++ else authViewModel.setError("DOB required")
+                }, modifier = Modifier.fillMaxWidth()) {
+                    Text("Next")
+                }
+            }
+
+            3 -> {
+                Text("Step 3: Password", style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    label = { Text("Confirm Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    if (password == confirmPassword && password.length >= 6) {
+                        coroutineScope.launch {
+                            authViewModel.signupWithDetails(
+                                email = email,
+                                password = password,
+                                fullName = fullName,
+                                username = username,
+                                accountType = accountType.ifBlank { customAccountType },
+                                dob = dob,
+                                phone = "" // phone removed
+                            )
+                        }
+                    } else {
+                        authViewModel.setError("Password does not match or too short")
+                    }
+                }, modifier = Modifier.fillMaxWidth()) {
+                    Text("Sign Up")
+                }
             }
         }
 
@@ -192,53 +172,11 @@ OutlinedTextField(
             }
             is AuthState.Error -> {
                 Text(
-                    text = (authState as AuthState.Error).message ?: "Signup failed",
+                    text = (authState as AuthState.Error).message ?: "Error",
                     color = MaterialTheme.colorScheme.error
                 )
             }
             else -> {}
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextButton(onClick = onNavigateToLogin) {
-            Text("Already have an account? Login")
-        }
-    }
-}
-
-@Composable
-fun DropdownMenuBox(
-    selectedOption: String,
-    options: List<String>,
-    label: String,
-    onOptionSelected: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = {},
-            label = { Text(label) },
-            readOnly = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = true }
-        )
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                )
-            }
         }
     }
 }
