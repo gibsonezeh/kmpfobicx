@@ -16,8 +16,13 @@ fun SignupScreen(
     onSignupSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
+    var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val accountTypes = listOf("Fabricator", "Customer", "Retailer", "Freelancer")
+    var selectedAccountType by remember { mutableStateOf(accountTypes.first()) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
 
     val authState by authViewModel.authState.collectAsState()
 
@@ -29,6 +34,15 @@ fun SignupScreen(
     ) {
         Text("Sign Up", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(24.dp))
+
+        OutlinedTextField(
+            value = fullName,
+            onValueChange = { fullName = it },
+            label = { Text("Full Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = email,
@@ -47,10 +61,42 @@ fun SignupScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = isDropdownExpanded,
+            onExpandedChange = { isDropdownExpanded = !isDropdownExpanded }
+        ) {
+            OutlinedTextField(
+                readOnly = true,
+                value = selectedAccountType,
+                onValueChange = {},
+                label = { Text("Select Account Type") },
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded) }
+            )
+            ExposedDropdownMenu(
+                expanded = isDropdownExpanded,
+                onDismissRequest = { isDropdownExpanded = false }
+            ) {
+                accountTypes.forEach { type ->
+                    DropdownMenuItem(
+                        text = { Text(type) },
+                        onClick = {
+                            selectedAccountType = type
+                            isDropdownExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { authViewModel.signup(email, password) },
+            onClick = {
+                authViewModel.signup(email, password, fullName, selectedAccountType)
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Sign Up")
