@@ -33,6 +33,14 @@ class AuthViewModel : ViewModel() {
         _authState.value = AuthState.Error(message)
     }
 
+    fun isLoggedIn(): Boolean {
+        return firebaseAuth.currentUser != null
+    }
+
+    fun logout(){
+        firebaseAuth.signOut()
+    }
+
     // Simulated username check — replace with real logic
     fun checkUsernameExists(username: String, callback: (Boolean) -> Unit) {
         // Simulate username not existing

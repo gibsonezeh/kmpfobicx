@@ -2,9 +2,28 @@
 
 package com.gibson.fobicx.ui.screens.auth
 
-import android.app.DatePickerDialog import android.util.Patterns import androidx.compose.foundation.layout.* import androidx.compose.material3.* import androidx.compose.runtime.* import androidx.compose.ui.Modifier import androidx.compose.ui.platform.LocalContext import androidx.compose.ui.text.input.PasswordVisualTransformation import androidx.compose.ui.unit.dp import androidx.lifecycle.viewmodel.compose.viewModel import com.gibson.fobicx.viewmodel.AuthState import com.gibson.fobicx.viewmodel.AuthViewModel import com.google.firebase.FirebaseException import com.google.firebase.auth.PhoneAuthCredential import com.google.firebase.auth.PhoneAuthOptions import com.google.firebase.auth.PhoneAuthProvider import kotlinx.coroutines.launch import java.util.* import java.util.concurrent.TimeUnit
+import android.app.DatePickerDialog
+import android.app.Activity
+import android.util.Patterns
+import androidx.compose.foundation.layout.* import androidx.compose.material3.* import androidx.compose.runtime.* import androidx.compose.ui.Modifier import androidx.compose.ui.platform.LocalContext import androidx.compose.ui.text.input.PasswordVisualTransformation import androidx.compose.ui.unit.dp import androidx.lifecycle.viewmodel.compose.viewModel import com.gibson.fobicx.viewmodel.AuthState import com.gibson.fobicx.viewmodel.AuthViewModel import com.google.firebase.FirebaseException import com.google.firebase.auth.PhoneAuthCredential import com.google.firebase.auth.PhoneAuthOptions import com.google.firebase.auth.PhoneAuthProvider import kotlinx.coroutines.launch import java.util.* import java.util.concurrent.TimeUnit
 
-@Composable fun SignupScreen( authViewModel: AuthViewModel = viewModel(), onSignupSuccess: () -> Unit ) { var currentStep by remember { mutableStateOf(1) } var fullName by remember { mutableStateOf("") } var username by remember { mutableStateOf("") } var email by remember { mutableStateOf("") } var accountType by remember { mutableStateOf("") } var customAccountType by remember { mutableStateOf("") } var dob by remember { mutableStateOf("") } var password by remember { mutableStateOf("") } var confirmPassword by remember { mutableStateOf("") } var phone by remember { mutableStateOf("") } var codeSent by remember { mutableStateOf(false) } var otpCode by remember { mutableStateOf("") } var verificationId by remember { mutableStateOf<String?>(null) }
+@Composable fun SignupScreen( authViewModel: AuthViewModel = viewModel(),
+                              onSignupSuccess: () -> Unit ,
+                              onNavigateToLogin: () -> Unit
+)
+{ var currentStep by remember { mutableStateOf(1) }
+    var fullName by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var accountType by remember { mutableStateOf("") }
+    var customAccountType by remember { mutableStateOf("") }
+    var dob by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var codeSent by remember { mutableStateOf(false) }
+    var otpCode by remember { mutableStateOf("") }
+    var verificationId by remember { mutableStateOf<String?>(null) }
 
 val authState by authViewModel.authState.collectAsState()
 val context = LocalContext.current
@@ -86,7 +105,7 @@ Column(
                     val options = PhoneAuthOptions.newBuilder(authViewModel.firebaseAuth)
                         .setPhoneNumber(phone)
                         .setTimeout(60L, TimeUnit.SECONDS)
-                        .setActivity(authViewModel.currentActivity)
+                        .setActivity(context as Activity)
                         .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                                 otpCode = credential.smsCode ?: ""
