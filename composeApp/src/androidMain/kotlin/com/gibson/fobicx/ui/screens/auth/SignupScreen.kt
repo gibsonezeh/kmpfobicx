@@ -1,4 +1,4 @@
-//@OptIn(ExperimentalMaterial3Api::class)
+
 
 package com.gibson.fobicx.ui.screens.auth
 
@@ -16,11 +16,12 @@ import com.gibson.fobicx.viewmodel.AuthState
 import com.gibson.fobicx.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 import java.util.*
-
+ @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MultiStepSignupScreen(
+fun SignupScreen(
     authViewModel: AuthViewModel = viewModel(),
-    onSignupSuccess: () -> Unit
+    onSignupSuccess: () -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
     var currentStep by remember { mutableStateOf(1) }
     var fullName by remember { mutableStateOf("") }
