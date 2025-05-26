@@ -3,8 +3,9 @@ package com.gibson.fobicx.navigation
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
-import com.gibson.fobicx.ui.screens.*
-import com.gibson.fobicx.ui.screens.auth.*
+import com.gibson.fobicx.ui.screens.MainScreen
+import com.gibson.fobicx.ui.screens.auth.LoginScreen
+import com.gibson.fobicx.ui.screens.auth.SignupScreen
 import com.gibson.fobicx.viewmodel.AuthViewModel
 
 object Routes {
@@ -12,6 +13,7 @@ object Routes {
     const val SIGNUP = "signup"
     const val HOME = "home"
 }
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -22,22 +24,28 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Routes.LOGIN) {
             LoginScreen(
+                authViewModel = authViewModel,
                 onLoginSuccess = {
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 },
-                onNavigateToSignup = { navController.navigate(Routes.SIGNUP) }
+                onNavigateToSignup = {
+                    navController.navigate(Routes.SIGNUP)
+                }
             )
         }
         composable(Routes.SIGNUP) {
             SignupScreen(
+                authViewModel = authViewModel,
                 onSignupSuccess = {
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.SIGNUP) { inclusive = true }
                     }
                 },
-                onNavigateToLogin = { navController.navigate(Routes.LOGIN) }
+                onNavigateToLogin = {
+                    navController.navigate(Routes.LOGIN)
+                }
             )
         }
         composable(Routes.HOME) {
