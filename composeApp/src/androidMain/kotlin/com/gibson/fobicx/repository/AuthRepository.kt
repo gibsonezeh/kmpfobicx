@@ -1,5 +1,6 @@
 package com.gibson.fobicx.repository
 
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
@@ -17,36 +18,56 @@ class AuthRepository {
         return result.isEmpty
     }
 
-    suspend fun signupWithEmail(
-        email: String,
-        password: String,
-        fullName: String,
-        username: String,
-        accountType: String,
-        dob: String,
-        phoneNumber: String
-    ): Result<Unit> {
+    // Sign up with email and password only
+    suspend fun signupWithEmail(email: String, password: String): Result<Unit> {
         return try {
-            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-            val uid = authResult.user?.uid ?: throw Exception("User ID not found")
-
-            val userData = hashMapOf(
-                "uid" to uid,
-                "email" to email,
-                "fullName" to fullName,
-                "username" to username,
-                "accountType" to accountType,
-                "dob" to dob,
-                "phoneNumber" to phoneNumber
-            )
-
-            firestore.collection("users").document(uid).set(userData).await()
+            auth.createUserWithEmailAndPassword(email, password).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
+    // Save or update user profile data
+    suspend fun saveUserProfile(
+        fullName: String,
+        username: String,
+        accountType: String,
+        dob: String,
+        phoneNumber: String?
+    ): Result<Unit> {
+        return try {
+            val uid = auth.currentUser?.uid ?: throw Exception("User not logged in")
+            val docRef = firestore.collection("users").document(uid)
+
+            val userSnapshot = docRef.get().await()
+            val isFirstTime = !userSnapshot.exists()
+
+            val profileData = mutableMapOf(
+                "uid" to uid,
+                "email" to auth.currentUser?.email,
+                "fullName" to fullName,
+                "username" to username,
+                "accountType" to accountType,
+                "dob" to dob
+            )
+
+            phoneNumber?.let {
+                profileData["phoneNumber"] = it
+            }
+
+            if (isFirstTime) {
+                profileData["createdAt"] = Timestamp.now()
+            }
+
+            docRef.set(profileData, com.google.firebase.firestore.SetOptions.merge()).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Phone verification
     fun verifyPhoneCode(credential: PhoneAuthCredential, onComplete: (Result<Unit>) -> Unit) {
         auth.signInWithCredential(credential)
             .addOnSuccessListener { onComplete(Result.success(Unit)) }
@@ -56,4 +77,5 @@ class AuthRepository {
     fun signOut() = auth.signOut()
     fun isUserLoggedIn() = auth.currentUser != null
     fun getCurrentUserEmail() = auth.currentUser?.email
+    fun getCurrentUserId() = auth.currentUser?.uid
 }
