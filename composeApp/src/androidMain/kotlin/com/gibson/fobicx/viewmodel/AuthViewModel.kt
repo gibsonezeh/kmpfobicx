@@ -1,13 +1,12 @@
-// AuthViewModel.kt
 package com.gibson.fobicx.viewmodel
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import androidx.lifecycle.viewModelScope
+import com.gibson.fobicx.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 sealed class AuthState {
     object Idle : AuthState()
@@ -18,7 +17,7 @@ sealed class AuthState {
 
 class AuthViewModel : ViewModel() {
 
-    val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val repository = AuthRepository()
     var currentActivity: Activity? = null
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -28,18 +27,16 @@ class AuthViewModel : ViewModel() {
         _authState.value = AuthState.Error(message)
     }
 
-    fun isLoggedIn(): Boolean {
-        return firebaseAuth.currentUser != null
-    }
+    fun isLoggedIn(): Boolean = repository.isUserLoggedIn()
 
     fun logout() {
-        firebaseAuth.signOut()
+        repository.signOut()
         _authState.value = AuthState.Idle
     }
 
     fun login(email: String, password: String) {
         _authState.value = AuthState.Loading
-        firebaseAuth.signInWithEmailAndPassword(email, password)
+        repository.firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     _authState.value = AuthState.Success
@@ -49,43 +46,27 @@ class AuthViewModel : ViewModel() {
             }
     }
 
-    fun signupWithDetails(
-        email: String,
-        password: String,
+    // Step 1: Sign up with email & password only
+    fun signup(email: String, password: String) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            val result = repository.signupWithEmail(email, password)
+            _authState.value = if (result.isSuccess) AuthState.Success else AuthState.Error(result.exceptionOrNull()?.message)
+        }
+    }
+
+    // Step 2: Save or update profile
+    fun saveProfile(
         fullName: String,
         username: String,
         accountType: String,
         dob: String,
-        phone: String
+        phone: String?
     ) {
-        _authState.value = AuthState.Loading
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val uid = firebaseAuth.currentUser?.uid ?: return@addOnCompleteListener
-                    val userData = mapOf(
-                        "uid" to uid,
-                        "email" to email,
-                        "fullName" to fullName,
-                        "username" to username,
-                        "accountType" to accountType,
-                        "dob" to dob,
-                        "phone" to phone,
-                        "createdAt" to FieldValue.serverTimestamp()
-                    )
-                    FirebaseFirestore.getInstance()
-                        .collection("users")
-                        .document(uid)
-                        .set(userData)
-                        .addOnSuccessListener {
-                            _authState.value = AuthState.Success
-                        }
-                        .addOnFailureListener {
-                            _authState.value = AuthState.Error(it.message)
-                        }
-                } else {
-                    _authState.value = AuthState.Error(task.exception?.message)
-                }
-            }
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            val result = repository.saveUserProfile(fullName, username, accountType, dob, phone)
+            _authState.value = if (result.isSuccess) AuthState.Success else AuthState.Error(result.exceptionOrNull()?.message)
+        }
     }
 }
