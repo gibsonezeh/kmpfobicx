@@ -1,5 +1,5 @@
 // SignupScreen.kt 
-package com.gibson.fobicx.screens
+package com.gibson.fobicx.screens.auth
 
 import androidx.compose.foundation.layout.* 
 import androidx.compose.material3.*
