@@ -6,15 +6,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.gibson.fobicx.navigation.Routes
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gibson.fobicx.viewmodel.AuthState
 import com.gibson.fobicx.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel = viewModel(),
+    onLoginSuccess: () -> Unit,
+    onNavigateToSignup: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -57,7 +57,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextButton(onClick = { navController.navigate(Routes.SIGNUP) }) {
+        TextButton(onClick = onNavigateToSignup) {
             Text("Don't have an account? Sign Up")
         }
 
@@ -66,11 +66,7 @@ fun LoginScreen(
         when (authState) {
             is AuthState.Loading -> CircularProgressIndicator()
             is AuthState.Success -> {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.LOGIN) { inclusive = true }
-                    }
-                }
+                LaunchedEffect(Unit) { onLoginSuccess() }
             }
             is AuthState.Error -> {
                 Text(
