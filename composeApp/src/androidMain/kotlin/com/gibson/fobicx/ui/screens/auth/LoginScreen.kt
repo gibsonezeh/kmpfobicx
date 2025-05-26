@@ -18,7 +18,6 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
     val authState by authViewModel.authState.collectAsState()
 
     Column(
@@ -58,9 +57,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextButton(
-            onClick = { navController.navigate(Routes.SIGNUP) }
-        ) {
+        TextButton(onClick = { navController.navigate(Routes.SIGNUP) }) {
             Text("Don't have an account? Sign Up")
         }
 
