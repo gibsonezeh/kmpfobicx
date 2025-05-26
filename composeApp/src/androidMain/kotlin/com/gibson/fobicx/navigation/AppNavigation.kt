@@ -2,7 +2,10 @@ package com.gibson.fobicx.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.*
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.gibson.fobicx.ui.screens.MainScreen
 import com.gibson.fobicx.ui.screens.auth.LoginScreen
 import com.gibson.fobicx.ui.screens.auth.SignupScreen
@@ -23,30 +26,10 @@ fun AppNavigation() {
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Routes.LOGIN) {
-            LoginScreen(
-                authViewModel = authViewModel,
-                onLoginSuccess = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.LOGIN) { inclusive = true }
-                    }
-                },
-                onNavigateToSignup = {
-                    navController.navigate(Routes.SIGNUP)
-                }
-            )
+            LoginScreen(navController = navController, authViewModel = authViewModel)
         }
         composable(Routes.SIGNUP) {
-            SignupScreen(
-                authViewModel = authViewModel,
-                onSignupSuccess = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.SIGNUP) { inclusive = true }
-                    }
-                },
-                onNavigateToLogin = {
-                    navController.navigate(Routes.LOGIN)
-                }
-            )
+            SignupScreen(navController = navController, authViewModel = authViewModel)
         }
         composable(Routes.HOME) {
             MainScreen(
