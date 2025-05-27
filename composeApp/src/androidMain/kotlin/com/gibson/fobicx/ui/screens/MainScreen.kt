@@ -48,7 +48,7 @@ fun MainScreen(onLogout: () -> Unit) {
             composable(Screen.Post.route) { PostScreen() }
             composable(Screen.Stock.route) { StockScreen() }
             composable(Screen.Me.route) {
-                ProfileScreen(onLogout = onLogout)
+                ProfileScreen()
             }
         }
     }

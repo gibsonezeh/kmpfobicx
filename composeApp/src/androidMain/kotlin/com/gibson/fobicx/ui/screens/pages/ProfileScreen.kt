@@ -14,7 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun ProfileScreen(authViewModel: AuthViewModel = viewModel()) {
+fun ProfileScreen(
+authViewModel: AuthViewModel = viewModel()) {
     val context = LocalContext.current
     val currentUser = FirebaseAuth.getInstance().currentUser
     val uid = currentUser?.uid

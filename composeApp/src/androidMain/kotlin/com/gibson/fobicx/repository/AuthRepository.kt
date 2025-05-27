@@ -18,6 +18,15 @@ class AuthRepository {
         return result.isEmpty
     }
 
+    suspend fun loginWithEmail(email: String, password: String): Result<Unit>{
+        return try {
+            auth.signInWithEmailAndPassword(email, password).await()
+            Result.success(Unit)
+        } catch (e: Exception){
+            Result.failure(e)
+        }
+    }
+
     // Sign up with email and password only
     suspend fun signupWithEmail(email: String, password: String): Result<Unit> {
         return try {
@@ -43,7 +52,7 @@ class AuthRepository {
             val userSnapshot = docRef.get().await()
             val isFirstTime = !userSnapshot.exists()
 
-            val profileData = mutableMapOf(
+            val profileData = mutableMapOf<String, Any?>(
                 "uid" to uid,
                 "email" to auth.currentUser?.email,
                 "fullName" to fullName,

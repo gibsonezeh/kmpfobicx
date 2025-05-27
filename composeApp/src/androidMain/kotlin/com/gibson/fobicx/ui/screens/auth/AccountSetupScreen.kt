@@ -1,8 +1,28 @@
 package com.gibson.fobicx.ui.screens.auth
 
-import android.widget.Toast import androidx.compose.foundation.layout.* import androidx.compose.material3.* import androidx.compose.runtime.* import androidx.compose.ui.Modifier import androidx.compose.ui.platform.LocalContext import androidx.compose.ui.text.input.TextFieldValue import androidx.compose.ui.unit.dp import androidx.lifecycle.viewmodel.compose.viewModel import androidx.navigation.NavController import com.gibson.fobicx.viewmodel.AuthViewModel import com.google.firebase.Timestamp import com.google.firebase.auth.FirebaseAuth import com.google.firebase.firestore.FirebaseFirestore import java.text.SimpleDateFormat import java.util.*
+import android.widget.Toast
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.gibson.fobicx.viewmodel.AuthViewModel
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.concurrent.TimeUnit
 
-@Composable fun AccountSetupScreen( navController: NavController, authViewModel: AuthViewModel = viewModel(), onSkip: () -> Unit, onSave: () -> Unit ) { val context = LocalContext.current val db = FirebaseFirestore.getInstance() val currentUser = FirebaseAuth.getInstance().currentUser
+@Composable fun AccountSetupScreen( navController: NavController, authViewModel: AuthViewModel = viewModel(), onSkip: () -> Unit, onSave: () -> Unit ) {
+    val context = LocalContext.current
+    val db = FirebaseFirestore.getInstance()
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
 var fullName by remember { mutableStateOf("") }
 var userName by remember { mutableStateOf("") }

@@ -42,20 +42,24 @@ NavHost(navController = navController, startDestination = startDestination) {
 
     composable(Routes.ACCOUNT_SETUP) {
         AccountSetupScreen(
-            onContinue = { navController.navigate(Routes.PHONE_VERIFICATION) },
-            onSkip = { navController.navigate(Routes.HOME) }
+            navController = navController,
+            onSave = { navController.navigate(Routes.PHONE_VERIFICATION) },
+            onSkip = { navController.navigate(Routes.HOME)
+            }
         )
     }
 
     composable(Routes.PHONE_VERIFICATION) {
-        PhoneVerificationScreen(
-            onVerified = { navController.navigate(Routes.HOME) },
+        PhoneNumberVerificationScreen(
+            onVerificationSuccess = { navController.navigate(Routes.HOME) },
             onSkip = { navController.navigate(Routes.HOME) }
         )
     }
 
     composable(Routes.HOME) {
-        MainScreen()
+        MainScreen(
+            onLogout = {}
+        )
     }
 }
 
