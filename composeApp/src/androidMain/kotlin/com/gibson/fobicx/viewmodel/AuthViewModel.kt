@@ -2,11 +2,16 @@ package com.gibson.fobicx.viewmodel
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.gibson.fobicx.repository.AuthRepository
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.viewModelScope
+import com.gibson.fobicx.repository.AuthRepository
 import kotlinx.coroutines.launch
+
 
 sealed class AuthState {
     object Idle : AuthState()
@@ -17,7 +22,9 @@ sealed class AuthState {
 
 class AuthViewModel : ViewModel() {
 
-    private val repository = AuthRepository()
+    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
+
     var currentActivity: Activity? = null
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -27,16 +34,18 @@ class AuthViewModel : ViewModel() {
         _authState.value = AuthState.Error(message)
     }
 
-    fun isLoggedIn(): Boolean = repository.isUserLoggedIn()
+    fun isLoggedIn(): Boolean {
+        return firebaseAuth.currentUser != null
+    }
 
     fun logout() {
-        repository.signOut()
+        firebaseAuth.signOut()
         _authState.value = AuthState.Idle
     }
 
     fun login(email: String, password: String) {
         _authState.value = AuthState.Loading
-        repository.firebaseAuth.signInWithEmailAndPassword(email, password)
+        firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     _authState.value = AuthState.Success
@@ -46,27 +55,81 @@ class AuthViewModel : ViewModel() {
             }
     }
 
-    // Step 1: Sign up with email & password only
-    fun signup(email: String, password: String) {
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-            val result = repository.signupWithEmail(email, password)
-            _authState.value = if (result.isSuccess) AuthState.Success else AuthState.Error(result.exceptionOrNull()?.message)
-        }
-    }
-
-    // Step 2: Save or update profile
-    fun saveProfile(
-        fullName: String,
-        username: String,
-        accountType: String,
-        dob: String,
+    fun signupWithDetails(
+        email: String,
+        password: String,
+        fullName: String?,
+        username: String?,
+        accountType: String?,
+        dob: String?,
         phone: String?
     ) {
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-            val result = repository.saveUserProfile(fullName, username, accountType, dob, phone)
-            _authState.value = if (result.isSuccess) AuthState.Success else AuthState.Error(result.exceptionOrNull()?.message)
-        }
+        _authState.value = AuthState.Loading
+
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val uid = firebaseAuth.currentUser?.uid ?: return@addOnCompleteListener
+                    val profileData = mutableMapOf<String, Any?>(
+                        "uid" to uid,
+                        "email" to email,
+                        "fullName" to fullName,
+                        "username" to username,
+                        "accountType" to accountType,
+                        "dob" to dob,
+                        "phone" to phone
+                    )
+
+                    // Only add `createdAt` timestamp if this is the first time
+                    profileData["createdAt"] = FieldValue.serverTimestamp()
+
+                    firestore.collection("users")
+                        .document(uid)
+                        .set(profileData)
+                        .addOnSuccessListener {
+                            _authState.value = AuthState.Success
+                        }
+                        .addOnFailureListener {
+                            _authState.value = AuthState.Error(it.message)
+                        }
+                } else {
+                    _authState.value = AuthState.Error(task.exception?.message)
+                }
+            }
+    }
+
+    fun updateUserProfile(
+        fullName: String?,
+        username: String?,
+        accountType: String?,
+        dob: String?,
+        phone: String?
+    ) {
+        val uid = firebaseAuth.currentUser?.uid ?: return
+        val updateData = mutableMapOf<String, Any?>()
+
+        fullName?.let { updateData["fullName"] = it }
+        username?.let { updateData["username"] = it }
+        accountType?.let { updateData["accountType"] = it }
+        dob?.let { updateData["dob"] = it }
+        phone?.let { updateData["phone"] = it }
+
+        firestore.collection("users")
+            .document(uid)
+            .update(updateData)
+            .addOnSuccessListener {
+                _authState.value = AuthState.Success
+            }
+            .addOnFailureListener {
+                _authState.value = AuthState.Error(it.message)
+            }
+    }
+
+    fun getCurrentUserEmail(): String? {
+        return firebaseAuth.currentUser?.email
+    }
+
+    fun getCurrentUserId(): String? {
+        return firebaseAuth.currentUser?.uid
     }
 }
