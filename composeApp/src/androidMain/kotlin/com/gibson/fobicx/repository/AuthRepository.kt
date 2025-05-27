@@ -1,135 +1,81 @@
-package com.gibson.fobicx.viewmodel
+package com.gibson.fobicx.repository
 
-import android.app.Activity
-import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import androidx.lifecycle.viewModelScope
-import com.gibson.fobicx.repository.AuthRepository
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
-
-sealed class AuthState {
-    object Idle : AuthState()
-    object Loading : AuthState()
-    object Success : AuthState()
-    class Error(val message: String?) : AuthState()
-}
-
-class AuthViewModel : ViewModel() {
-
-    private val firebaseAuth = FirebaseAuth.getInstance()
+class AuthRepository {
+    private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
 
-    var currentActivity: Activity? = null
-
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
-    val authState: StateFlow<AuthState> = _authState
-
-    fun setError(message: String) {
-        _authState.value = AuthState.Error(message)
+    suspend fun isUsernameAvailable(username: String): Boolean {
+        val result = firestore.collection("users")
+            .whereEqualTo("username", username)
+            .get().await()
+        return result.isEmpty
     }
 
-    fun isLoggedIn(): Boolean {
-        return firebaseAuth.currentUser != null
+    // Sign up with email and password only
+    suspend fun signupWithEmail(email: String, password: String): Result<Unit> {
+        return try {
+            auth.createUserWithEmailAndPassword(email, password).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
-    fun logout() {
-        firebaseAuth.signOut()
-        _authState.value = AuthState.Idle
-    }
+    // Save or update user profile data
+    suspend fun saveUserProfile(
+        fullName: String,
+        username: String,
+        accountType: String,
+        dob: String,
+        phoneNumber: String?
+    ): Result<Unit> {
+        return try {
+            val uid = auth.currentUser?.uid ?: throw Exception("User not logged in")
+            val docRef = firestore.collection("users").document(uid)
 
-    fun login(email: String, password: String) {
-        _authState.value = AuthState.Loading
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _authState.value = AuthState.Success
-                } else {
-                    _authState.value = AuthState.Error(task.exception?.message)
-                }
+            val userSnapshot = docRef.get().await()
+            val isFirstTime = !userSnapshot.exists()
+
+            val profileData = mutableMapOf(
+                "uid" to uid,
+                "email" to auth.currentUser?.email,
+                "fullName" to fullName,
+                "username" to username,
+                "accountType" to accountType,
+                "dob" to dob
+            )
+
+            phoneNumber?.let {
+                profileData["phoneNumber"] = it
             }
-    }
 
-    fun signupWithDetails(
-        email: String,
-        password: String,
-        fullName: String?,
-        username: String?,
-        accountType: String?,
-        dob: String?,
-        phone: String?
-    ) {
-        _authState.value = AuthState.Loading
-
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val uid = firebaseAuth.currentUser?.uid ?: return@addOnCompleteListener
-                    val profileData = mutableMapOf<String, Any?>(
-                        "uid" to uid,
-                        "email" to email,
-                        "fullName" to fullName,
-                        "username" to username,
-                        "accountType" to accountType,
-                        "dob" to dob,
-                        "phone" to phone
-                    )
-
-                    // Only add `createdAt` timestamp if this is the first time
-                    profileData["createdAt"] = FieldValue.serverTimestamp()
-
-                    firestore.collection("users")
-                        .document(uid)
-                        .set(profileData)
-                        .addOnSuccessListener {
-                            _authState.value = AuthState.Success
-                        }
-                        .addOnFailureListener {
-                            _authState.value = AuthState.Error(it.message)
-                        }
-                } else {
-                    _authState.value = AuthState.Error(task.exception?.message)
-                }
+            if (isFirstTime) {
+                profileData["createdAt"] = Timestamp.now()
             }
+
+            docRef.set(profileData, com.google.firebase.firestore.SetOptions.merge()).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
-    fun updateUserProfile(
-        fullName: String?,
-        username: String?,
-        accountType: String?,
-        dob: String?,
-        phone: String?
-    ) {
-        val uid = firebaseAuth.currentUser?.uid ?: return
-        val updateData = mutableMapOf<String, Any?>()
-
-        fullName?.let { updateData["fullName"] = it }
-        username?.let { updateData["username"] = it }
-        accountType?.let { updateData["accountType"] = it }
-        dob?.let { updateData["dob"] = it }
-        phone?.let { updateData["phone"] = it }
-
-        firestore.collection("users")
-            .document(uid)
-            .update(updateData)
-            .addOnSuccessListener {
-                _authState.value = AuthState.Success
-            }
-            .addOnFailureListener {
-                _authState.value = AuthState.Error(it.message)
-            }
+    // Phone verification
+    fun verifyPhoneCode(credential: PhoneAuthCredential, onComplete: (Result<Unit>) -> Unit) {
+        auth.signInWithCredential(credential)
+            .addOnSuccessListener { onComplete(Result.success(Unit)) }
+            .addOnFailureListener { onComplete(Result.failure(it)) }
     }
 
-    fun getCurrentUserEmail(): String? {
-        return firebaseAuth.currentUser?.email
-    }
-
-    fun getCurrentUserId(): String? {
-        return firebaseAuth.currentUser?.uid
-    }
+    fun signOut() = auth.signOut()
+    fun isUserLoggedIn() = auth.currentUser != null
+    fun getCurrentUserEmail() = auth.currentUser?.email
+    fun getCurrentUserId() = auth.currentUser?.uid
 }
