@@ -1,30 +1,47 @@
 package com.gibson.fobicx.ui.screens.pages
 
 import androidx.compose.runtime.*
-import com.gibson.fobicx.ui.components.SettingsSection
-import com.gibson.fobicx.ui.components.SettingsIten
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ProfileScreen(
-    navController: NavController,
-    viewModel: ProfileViewModel = viewModel()
+    navController: NavController
 ) {
-    val user by viewModel.userProfile.collectAsState()
+    var userName by remember { mutableStateOf("Loading...") }
+    var userEmail by remember { mutableStateOf("Loading...") }
+    var avatarUrl by remember { mutableStateOf("https://via.placeholder.com/64") }
+
+    // Fetch user info from Firebase
+    LaunchedEffect(Unit) {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            val uid = it.uid
+            FirebaseFirestore.getInstance().collection("users").document(uid)
+                .get()
+                .addOnSuccessListener { doc ->
+                    userName = doc.getString("fullName") ?: "No Name"
+                    userEmail = doc.getString("email") ?: "No Email"
+                    avatarUrl = doc.getString("avatarUrl") ?: avatarUrl
+                }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -38,22 +55,22 @@ fun ProfileScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         ) {
             Image(
-                painter = rememberImagePainter(user.avatarUrl ?: "https://via.placeholder.com/64"),
+                painter = rememberImagePainter(avatarUrl),
                 contentDescription = "Profile Image",
                 modifier = Modifier
                     .size(64.dp)
-                    .clip(MaterialTheme.shapes.medium)
+                    .clip(CircleShape)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(text = user.name, color = Color.White, fontSize = MaterialTheme.typography.h6.fontSize)
-                Text(text = user.email, color = Color.Gray)
+                Text(text = userName, color = Color.White, fontSize = MaterialTheme.typography.h6.fontSize)
+                Text(text = userEmail, color = Color.Gray)
             }
         }
 
         // Plan Card
         Card(
-            backgroundColor = Color.DarkGray,
+            colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -77,7 +94,7 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Menu sections
+        // Menu Sections
         SettingsSection("Menus") {
             SettingsItem("Share with a friend") {}
             SettingsItem("Knowledge") {}
@@ -95,6 +112,31 @@ fun ProfileScreen(
         SettingsSection("Information") {
             SettingsItem("Rate this app") {}
             SettingsItem("Contact us") {}
+        }
+    }
+}
+
+// Custom Composables
+@Composable
+fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Text(text = title, color = Color.Gray, fontSize = 12.sp)
+        content()
+    }
+}
+
+@Composable
+fun SettingsItem(text: String, rightText: String? = null, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text, color = Color.White)
+        rightText?.let {
+            Text(it, color = Color.Gray)
         }
     }
 }
