@@ -1,6 +1,8 @@
 package com.gibson.fobicx.ui.screens.pages
 
 import androidx.compose.runtime.*
+import com.gibson.fobicx.ui.components.SettingsSection
+import com.gibson.fobicx.ui.components.SettingsIten
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
