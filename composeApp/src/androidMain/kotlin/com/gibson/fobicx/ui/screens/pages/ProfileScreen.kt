@@ -13,94 +13,106 @@ import com.gibson.fobicx.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-@Composable
+
+            @Composable
 fun ProfileScreen(
-authViewModel: AuthViewModel = viewModel()) {
-    val context = LocalContext.current
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    val uid = currentUser?.uid
-
-    var fullName by remember { mutableStateOf("") }
-    var userName by remember { mutableStateOf("") }
-    var dob by remember { mutableStateOf("") }
-    var accountType by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf(currentUser?.email ?: "") }
-
-    var isEditing by remember { mutableStateOf(false) }
-    val db = FirebaseFirestore.getInstance()
-
-    LaunchedEffect(uid) {
-        uid?.let {
-            db.collection("users").document(it).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        fullName = document.getString("fullName") ?: ""
-                        userName = document.getString("userName") ?: ""
-                        dob = document.getString("dob") ?: ""
-                        accountType = document.getString("accountType") ?: ""
-                        phoneNumber = document.getString("phoneNumber") ?: ""
-                    }
-                }
-        }
-    }
-
+    userName: String,
+    userEmail: String,
+    onAccountClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center
+            .background(Color.Black)
+            .padding(16.dp)
     ) {
-        Text("My Profile", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (isEditing) {
-            OutlinedTextField(value = fullName, onValueChange = { fullName = it }, label = { Text("Full Name") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = userName, onValueChange = { userName = it }, label = { Text("Username") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = dob, onValueChange = { dob = it }, label = { Text("Date of Birth") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = accountType, onValueChange = { accountType = it }, label = { Text("Account Type") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = phoneNumber, onValueChange = { phoneNumber = it }, label = { Text("Phone Number") }, modifier = Modifier.fillMaxWidth())
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    uid?.let {
-                        val updatedData = mapOf(
-                            "fullName" to fullName,
-                            "userName" to userName,
-                            "dob" to dob,
-                            "accountType" to accountType,
-                            "phoneNumber" to phoneNumber
-                        )
-                        db.collection("users").document(it).update(updatedData)
-                            .addOnSuccessListener {
-                                Toast.makeText(context, "Profile updated", Toast.LENGTH_SHORT).show()
-                                isEditing = false
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show()
-                            }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Save")
+        // Header
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_avatar), // Replace with user avatar
+                contentDescription = "Profile Image",
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(text = userName, color = Color.White, fontSize = 20.sp)
+                Text(text = userEmail, color = Color.Gray)
             }
-        } else {
-            Text("Full Name: $fullName")
-            Text("Username: $userName")
-            Text("Email: $email")
-            Text("Date of Birth: $dob")
-            Text("Account Type: $accountType")
-            Text("Phone Number: $phoneNumber")
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { isEditing = true },
-                modifier = Modifier.fillMaxWidth()
+        // Plan Card
+        Card(
+            backgroundColor = Color.DarkGray,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Edit")
+                Column {
+                    Text("Free", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Credits", color = Color.Gray)
+                    Text("0 ★", color = Color.White)
+                    Text("Daily credits refresh at 01:00", color = Color.Gray, fontSize = 12.sp)
+                }
+                Button(onClick = { /* Upgrade logic */ }) {
+                    Text("Upgrade")
+                }
             }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Menu Sections
+        SettingsSection("Menus") {
+            SettingsItem("Share with a friend") { /* Navigate */ }
+            SettingsItem("Knowledge") { /* Navigate */ }
+            SettingsItem("Language", rightText = "English") { /* Navigate */ }
+        }
+
+        SettingsSection("General") {
+            SettingsItem("Account") {
+                onAccountClick() // navigate to profile details
+            }
+            SettingsItem("Appearance", rightText = "Follow system") { /* Theme */ }
+            SettingsItem("Clear cache", rightText = "2 MB") { /* Clear logic */ }
+        }
+
+        SettingsSection("Information") {
+            SettingsItem("Rate this app") { /* Open Play Store */ }
+            SettingsItem("Contact us") { /* Contact support */ }
+        }
+    }
+}
+
+@Composable
+fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Text(text = title, color = Color.Gray, fontSize = 12.sp)
+        content()
+    }
+}
+
+@Composable
+fun SettingsItem(text: String, rightText: String? = null, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text, color = Color.White)
+        rightText?.let {
+            Text(it, color = Color.Gray)
         }
     }
 }
