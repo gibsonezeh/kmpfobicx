@@ -11,14 +11,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+//import compose.AsyncImage
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.auth.FirebaseAuth
+import android.R.attr.contentDescription
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
+import org.jetbrains.compose.resources.imageResource
 
 @Composable
 fun AccountDetailsScreen(
@@ -57,13 +60,13 @@ fun AccountDetailsScreen(
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            GlideImage(
-                model = avatarUrl,
-                contentDescription = "Avatar",
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-            )
+
+             GlideImage(
+                                     url = avatarUrl,
+                                     modifier = Modifier
+                                         .size(64.dp)
+                                         .clip(CircleShape)
+             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
