@@ -1,115 +1,100 @@
 package com.gibson.fobicx.ui.screens.pages
 
-import android.widget.ImageView
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.bumptech.glide.Glide
+import androidx.core.net.toUri
+import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.text.font.FontWeight
+import kotlinx.coroutines.tasks.await
 
 @Composable
-fun AccountDetailsScreen(navController: NavController) {
-    var fullName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
-    var avatarUrl by remember { mutableStateOf("https://via.placeholder.com/150") }
+fun AccountDetailsScreen() {
+    val context = LocalContext.current
+
+    var fullName by remember { mutableStateOf("Loading...") }
+    var email by remember { mutableStateOf("Loading...") }
+    var phone by remember { mutableStateOf("Loading...") }
+    var username by remember { mutableStateOf("Loading...") }
+    var avatarUrl by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         val user = FirebaseAuth.getInstance().currentUser
-        user?.let {
-            val uid = it.uid
-            FirebaseFirestore.getInstance().collection("users").document(uid)
-                .get()
-                .addOnSuccessListener { doc ->
-                    fullName = doc.getString("fullName") ?: ""
-                    email = doc.getString("email") ?: ""
-                    username = doc.getString("username") ?: ""
-                    phoneNumber = doc.getString("phoneNumber") ?: ""
-                    avatarUrl = doc.getString("avatarUrl") ?: avatarUrl
-                    isLoading = false
-                }
-                .addOnFailureListener {
-                    isLoading = false
-                }
+        if (user != null) {
+            try {
+                val doc = FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(user.uid)
+                    .get()
+                    .await()
+
+                fullName = doc.getString("fullName") ?: "No name"
+                email = doc.getString("email") ?: "No email"
+                phone = doc.getString("phone") ?: "No phone"
+                username = doc.getString("username") ?: "No username"
+                avatarUrl = doc.getString("avatarUrl") ?: ""
+
+                isLoading = false
+            } catch (e: Exception) {
+                errorMessage = "Error loading account info"
+                isLoading = false
+            }
+        } else {
+            errorMessage = "User not logged in"
+            isLoading = false
         }
     }
 
-    if (isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = Color.White)
-        }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-                .padding(24.dp)
-        ) {
-            Text(
-                text = "Account Details",
-                color = Color.White,
-                style = MaterialTheme.typography.h5,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                GlideImage(
-                    url = avatarUrl,
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column {
-                    Text(text = fullName, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Text(text = email, color = Color.Gray, fontSize = 14.sp)
-                }
+    Surface(modifier = Modifier.fillMaxSize()) {
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    AccountDetailItem(label = "Full Name", value = fullName)
-                    AccountDetailItem(label = "Email", value = email)
-                    AccountDetailItem(label = "Username", value = username)
-                    AccountDetailItem(label = "Phone Number", value = phoneNumber)
-                }
+        } else if (errorMessage != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = errorMessage ?: "Unknown error")
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { /* Navigate to edit profile screen */ },
-                modifier = Modifier.align(Alignment.End)
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Edit")
+                // Avatar
+                if (avatarUrl.isNotEmpty()) {
+                    GlideImage(
+                        model = avatarUrl,
+                        contentDescription = "User Avatar",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(8.dp),
+                        shape = CircleShape
+                    )
+                }
+
+                // Full Name
+                AccountDetailItem(label = "Full Name", value = fullName)
+
+                // Username
+                AccountDetailItem(label = "Username", value = username)
+
+                // Email
+                AccountDetailItem(label = "Email", value = email)
+
+                // Phone
+                AccountDetailItem(label = "Phone", value = phone)
             }
         }
     }
@@ -117,25 +102,9 @@ fun AccountDetailsScreen(navController: NavController) {
 
 @Composable
 fun AccountDetailItem(label: String, value: String) {
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        Text(text = label, color = Color.Gray, fontSize = 14.sp)
-        Text(text = value, color = Color.White, fontSize = 16.sp)
+    Column(horizontalAlignment = Alignment.Start, modifier = Modifier.fillMaxWidth()) {
+        Text(text = label, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+        Text(text = value, style = MaterialTheme.typography.bodyLarge)
+        Spacer(modifier = Modifier.height(8.dp))
     }
-}
-
-@Composable
-fun GlideImage(url: String, modifier: Modifier = Modifier) {
-    AndroidView(
-        factory = { context ->
-            ImageView(context).apply {
-                scaleType = ImageView.ScaleType.CENTER_CROP
-            }
-        },
-        update = { imageView ->
-            Glide.with(imageView.context)
-                .load(url)
-                .into(imageView)
-        },
-        modifier = modifier
-    )
 }
