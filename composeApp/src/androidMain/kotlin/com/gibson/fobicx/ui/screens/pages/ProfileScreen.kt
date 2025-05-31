@@ -1,6 +1,8 @@
 package com.gibson.fobicx.ui.screens.pages
 
 import android.widget.ImageView
+import androidx.compose.ui.draw.clip
+import com.bumptech.glide.Glide
 import androidx.compose.runtime.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,14 +17,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.bumptech.glide.Glide
+import com.gibson.fobicx.viewmodel.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ProfileScreen(
-    navController: NavController
+    navController: NavController,
+    onAccountClick: () -> Unit,
+    viewModel: ProfileViewModel= viewModel()
+
 ) {
     var userName by remember { mutableStateOf("Loading...") }
     var userEmail by remember { mutableStateOf("Loading...") }

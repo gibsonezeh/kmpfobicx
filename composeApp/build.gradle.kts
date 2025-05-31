@@ -2,10 +2,12 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.internal.Kapt3GradleSubplugin.Companion.findKaptConfiguration
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    id("kotlin-kapt")
     id("com.google.gms.google-services")
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
@@ -116,6 +118,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended-android:1.7.8")
     implementation("com.google.firebase:firebase-auth:23.2.0")
     implementation("androidx.compose.material3:material3:1.3.2")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    findKaptConfiguration("com.github.bumptech.glide:compiler:4.16.0")
+    //implementation("io.ciol-kt:coil-compose:2.4.0")
     implementation("androidx.navigation:navigation-compose:2.8.9")
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
