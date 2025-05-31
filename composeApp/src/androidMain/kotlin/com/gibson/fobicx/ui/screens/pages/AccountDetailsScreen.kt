@@ -21,11 +21,14 @@ import com.google.firebase.auth.FirebaseAuth
 import android.R.attr.contentDescription
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
+import androidx.navigation.Navigation
+import androidx.navigation.Navigator
 import org.jetbrains.compose.resources.imageResource
 
 @Composable
 fun AccountDetailsScreen(
-    navController: NavController
+    navController: NavController,
+
 ) {
     var fullName by remember { mutableStateOf("Loading...") }
     var email by remember { mutableStateOf("Loading...") }

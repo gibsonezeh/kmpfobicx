@@ -8,10 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable 
 import androidx.navigation.compose.rememberNavController 
 import com.gibson.fobicx.ui.screens.* 
-import com.gibson.fobicx.ui.screens.auth.* 
+import com.gibson.fobicx.ui.screens.auth.*
+import com.gibson.fobicx.ui.screens.pages.AccountDetailsScreen
 import com.gibson.fobicx.viewmodel.AuthViewModel
 
 object Routes {
+    const val ACCOUNT_DETAILS ="account_details"
     const val LOGIN = "login" 
     const val SIGNUP = "signup"
     const val ACCOUNT_SETUP = "account_setup"
@@ -53,6 +55,11 @@ NavHost(navController = navController, startDestination = startDestination) {
         PhoneNumberVerificationScreen(
             onVerificationSuccess = { navController.navigate(Routes.HOME) },
             onSkip = { navController.navigate(Routes.HOME) }
+        )
+    }
+    composable(Routes.ACCOUNT_DETAILS){
+        AccountDetailsScreen(
+            navController = navController
         )
     }
 

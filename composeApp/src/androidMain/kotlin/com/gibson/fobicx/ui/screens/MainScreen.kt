@@ -50,7 +50,7 @@ fun MainScreen(onLogout: () -> Unit) {
             composable(Screen.Me.route) {
                 ProfileScreen(
                     onAccountClick = {
-                        navController.navigate("account_details")
+                        navController.navigate("Routes.ACCOUNT_DETAILS")
                     },
                     navController = navController
                     
