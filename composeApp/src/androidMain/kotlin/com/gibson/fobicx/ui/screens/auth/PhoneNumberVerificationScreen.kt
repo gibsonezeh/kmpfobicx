@@ -18,8 +18,9 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.tasks.await 
 import java.util.concurrent.TimeUnit
 
-@Composable fun PhoneNumberVerificationScreen( onVerificationSuccess: () -> Unit, 
-                                              onSkip: () -> Unit ) { 
+@Composable fun PhoneNumberVerificationScreen(
+    onVerificationSuccess: () -> Unit,
+    onSkip: () -> Unit ) {
   val context = LocalContext.current 
   val activity = context as Activity 
   val auth = FirebaseAuth.getInstance()

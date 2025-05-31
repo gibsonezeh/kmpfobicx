@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController 
 import com.gibson.fobicx.ui.screens.* 
 import com.gibson.fobicx.ui.screens.auth.*
-import com.gibson.fobicx.ui.screens.pages.AccountDetailsScreen
+import com.gibson.fobicx.ui.screens.pages.*
 import com.gibson.fobicx.viewmodel.AuthViewModel
 
 object Routes {
@@ -59,7 +59,8 @@ NavHost(navController = navController, startDestination = startDestination) {
     }
     composable(Routes.ACCOUNT_DETAILS){
         AccountDetailsScreen(
-            navController = navController
+            navController = navController,
+            onAccountClick = { navController.navigate(Routes.ACCOUNT_DETAILS) }
         )
     }
 
