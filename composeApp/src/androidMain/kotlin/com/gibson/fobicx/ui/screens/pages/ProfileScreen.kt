@@ -1,7 +1,7 @@
 package com.gibson.fobicx.ui.screens.pages
 
+import android.widget.ImageView
 import androidx.compose.runtime.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,12 +11,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
-import coil.compose.rememberImagePainter
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -27,19 +27,30 @@ fun ProfileScreen(
     var userName by remember { mutableStateOf("Loading...") }
     var userEmail by remember { mutableStateOf("Loading...") }
     var avatarUrl by remember { mutableStateOf("https://via.placeholder.com/64") }
+    var isLoading by remember { mutableStateOf(true) }
 
     // Fetch user info from Firebase
     LaunchedEffect(Unit) {
         val user = FirebaseAuth.getInstance().currentUser
-        user?.let {
-            val uid = it.uid
+        if (user != null) {
+            val uid = user.uid
             FirebaseFirestore.getInstance().collection("users").document(uid)
                 .get()
                 .addOnSuccessListener { doc ->
                     userName = doc.getString("fullName") ?: "No Name"
                     userEmail = doc.getString("email") ?: "No Email"
                     avatarUrl = doc.getString("avatarUrl") ?: avatarUrl
+                    isLoading = false
                 }
+                .addOnFailureListener {
+                    userName = "Error"
+                    userEmail = "Failed to load"
+                    isLoading = false
+                }
+        } else {
+            userName = "Guest"
+            userEmail = "Not logged in"
+            isLoading = false
         }
     }
 
@@ -49,74 +60,96 @@ fun ProfileScreen(
             .background(Color.Black)
             .padding(16.dp)
     ) {
-        // Header
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 16.dp)
-        ) {
-            Image(
-                painter = rememberImagePainter(avatarUrl),
-                contentDescription = "Profile Image",
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = Color.White,
                 modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 100.dp)
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(text = userName, color = Color.White, fontSize = MaterialTheme.typography.h6.fontSize)
-                Text(text = userEmail, color = Color.Gray)
-            }
-        }
-
-        // Plan Card
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        } else {
+            // Header
             Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
+                GlideImage(
+                    url = avatarUrl,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
                 Column {
-                    Text("Free", color = Color.White, style = MaterialTheme.typography.body1)
-                    Text("Credits", color = Color.Gray)
-                    Text("0 ★", color = Color.White)
-                    Text("Daily credits refresh at 01:00", color = Color.Gray, fontSize = 12.sp)
-                }
-                Button(onClick = { /* Upgrade logic */ }) {
-                    Text("Upgrade")
+                    Text(text = userName, color = Color.White, fontSize = MaterialTheme.typography.h6.fontSize)
+                    Text(text = userEmail, color = Color.Gray)
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Menu Sections
-        SettingsSection("Menus") {
-            SettingsItem("Share with a friend") {}
-            SettingsItem("Knowledge") {}
-            SettingsItem("Language", rightText = "English") {}
-        }
-
-        SettingsSection("General") {
-            SettingsItem("Account") {
-                navController.navigate("account_details")
+            // Plan Card
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text("Free", color = Color.White, style = MaterialTheme.typography.body1)
+                        Text("Credits", color = Color.Gray)
+                        Text("0 ★", color = Color.White)
+                        Text("Daily credits refresh at 01:00", color = Color.Gray, fontSize = 12.sp)
+                    }
+                    Button(onClick = { /* Upgrade logic */ }) {
+                        Text("Upgrade")
+                    }
+                }
             }
-            SettingsItem("Appearance", rightText = "Follow system") {}
-            SettingsItem("Clear cache", rightText = "2 MB") {}
-        }
 
-        SettingsSection("Information") {
-            SettingsItem("Rate this app") {}
-            SettingsItem("Contact us") {}
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Menu Sections
+            SettingsSection("Menus") {
+                SettingsItem("Share with a friend") {}
+                SettingsItem("Knowledge") {}
+                SettingsItem("Language", rightText = "English") {}
+            }
+
+            SettingsSection("General") {
+                SettingsItem("Account") {
+                    navController.navigate("account_details")
+                }
+                SettingsItem("Appearance", rightText = "Follow system") {}
+                SettingsItem("Clear cache", rightText = "2 MB") {}
+            }
+
+            SettingsSection("Information") {
+                SettingsItem("Rate this app") {}
+                SettingsItem("Contact us") {}
+            }
         }
     }
 }
 
-// Custom Composables
+@Composable
+fun GlideImage(url: String, modifier: Modifier = Modifier) {
+    AndroidView(
+        factory = { context ->
+            ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                Glide.with(context).load(url).into(this)
+            }
+        },
+        modifier = modifier
+    )
+}
+
 @Composable
 fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
