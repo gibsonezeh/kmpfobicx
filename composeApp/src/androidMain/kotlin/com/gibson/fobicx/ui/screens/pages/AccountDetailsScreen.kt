@@ -1,18 +1,18 @@
 package com.gibson.fobicx.ui.screens.pages
 
-import androidx.compose.foundation.Image
+import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import androidx.compose.ui.viewinterop.AndroidView
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import cafe.adriel.voyager.core.screen.Screen
@@ -94,6 +94,8 @@ fun AccountDetailContent(
     dateOfBirth: String,
     avatarUrl: String
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -105,12 +107,20 @@ fun AccountDetailContent(
         Spacer(Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = rememberAsyncImagePainter(avatarUrl),
-                contentDescription = "Profile Image",
+            AndroidView(
                 modifier = Modifier
                     .size(64.dp)
-                    .clip(CircleShape)
+                    .background(Color.Gray, CircleShape),
+                factory = {
+                    ImageView(it).apply {
+                        clipToOutline = true
+                        scaleType = ImageView.ScaleType.CENTER_CROP
+                        Glide.with(context)
+                            .load(avatarUrl)
+                            .circleCrop()
+                            .into(this)
+                    }
+                }
             )
 
             Spacer(Modifier.width(16.dp))
@@ -122,7 +132,6 @@ fun AccountDetailContent(
         }
 
         Spacer(Modifier.height(24.dp))
-
         Divider(color = Color.Gray)
 
         InfoRow("Username", username)
