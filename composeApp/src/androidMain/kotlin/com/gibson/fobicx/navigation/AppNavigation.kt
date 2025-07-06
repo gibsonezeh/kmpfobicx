@@ -57,12 +57,6 @@ NavHost(navController = navController, startDestination = startDestination) {
             onSkip = { navController.navigate(Routes.HOME) }
         )
     }
-    composable(Routes.ACCOUNT_DETAILS){
-        AccountDetailsScreen(
-            navController = navController,
-            onAccountClick = { navController.navigate(Routes.ACCOUNT_DETAILS) }
-        )
-    }
 
     composable(Routes.HOME) {
         MainScreen(
