@@ -13,7 +13,6 @@ import com.gibson.fobicx.ui.screens.pages.*
 import com.gibson.fobicx.viewmodel.AuthViewModel
 
 object Routes {
-    const val ACCOUNT_DETAILS ="account_details"
     const val LOGIN = "login" 
     const val SIGNUP = "signup"
     const val ACCOUNT_SETUP = "account_setup"
